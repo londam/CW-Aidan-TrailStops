@@ -1,5 +1,5 @@
 // load GPX track as an array of points
-export default async function createGPXArray(url) {
+export default async function createGPXArray(url: URL) {
   try {
     const response = await fetch(url);
     if (!response.ok) {
