@@ -1,8 +1,9 @@
 import App from "./App.tsx";
+//import "./index.css";
 
-import ReactDOM from 'react-dom/client';
-import reportWebVitals from './reportWebVitals.ts';
-import 'leaflet/dist/leaflet.css';
+import ReactDOM from "react-dom/client";
+import reportWebVitals from "./reportWebVitals.ts";
+import "leaflet/dist/leaflet.css";
 
 // strict mode turned off to prevent double renders
 const root = ReactDOM.createRoot(document.getElementById("root") as HTMLElement);
