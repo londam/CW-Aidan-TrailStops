@@ -1,6 +1,8 @@
-async function getNearAccommodations(lat, lng) {
+async function getNearAccommodations(lat: number, lng: number) {
   try {
-    const response = await fetch(`http://localhost:3001/getAccommodation?lat=${lat}&lon=${lng}`);
+    const response: Response = await fetch(
+      `http://localhost:3001/getAccommodation?lat=${lat}&lon=${lng}`
+    );
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -13,7 +15,7 @@ async function getNearAccommodations(lat, lng) {
   }
 }
 
-async function extractAccommodations(lat, lng) {
+async function extractAccommodations(lat: number, lng: number) {
   const data = await getNearAccommodations(lat, lng);
   const { results } = data;
   if (results.length <= 0) {
@@ -27,13 +29,12 @@ async function extractAccommodations(lat, lng) {
     }
     const url = await fetchAccommodationPicture(results[i].photos[0].photo_reference);
     const { name, vicinity } = results[i];
-    console.log("image url", url);
     outputArr[i] = { name, url, vicinity };
   }
   return outputArr;
 }
 
-async function fetchAccommodationPicture(photoReference) {
+async function fetchAccommodationPicture(photoReference: string) {
   const response = await fetch(
     `http://localhost:3001/accommodationPic?photo_reference=${photoReference}`
   );

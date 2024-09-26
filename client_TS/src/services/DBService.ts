@@ -1,3 +1,6 @@
+import { SettingsData } from "../types/settingsData";
+import { UserMarker } from "../types/userMarker";
+
 async function getMarkers(user_id) {
   try {
     const response = await fetch(`http://localhost:3001/mapMarkers?user_id=${user_id}`);
@@ -8,7 +11,12 @@ async function getMarkers(user_id) {
   }
 }
 
-async function addMarker(user_id, marker, updatedMarkers, settings) {
+async function addMarker(
+  user_id: string,
+  marker: UserMarker,
+  updatedMarkers: UserMarker[],
+  settings: SettingsData
+) {
   try {
     const _id = marker._id;
     const response = await fetch("http://localhost:3001/mapMarkers", {

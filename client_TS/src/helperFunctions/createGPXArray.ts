@@ -1,26 +1,28 @@
+import { RoutePoint } from "../types/route";
+
 // load GPX track as an array of points
-export default async function createGPXArray(url: URL) {
+export default async function createGPXArray(url: string) {
   try {
-    const response = await fetch(url);
+    const response: Response = await fetch(url);
     if (!response.ok) {
       throw new Error(`error fetching route status: ${response.status}`);
     }
 
-    const gpxText = await response.text();
-    const parser = new DOMParser();
-    const gpxDoc = parser.parseFromString(gpxText, "application/xml");
+    const gpxText: string = await response.text();
+    const parser: DOMParser = new DOMParser();
+    const gpxDoc: Document = parser.parseFromString(gpxText, "application/xml");
 
     const trackPoints = gpxDoc.getElementsByTagName("trkpt");
-    const latLngArray = [];
+    const RoutePointsArray: RoutePoint[] = [];
 
     for (let i = 0; i < trackPoints.length; i++) {
-      const lat = trackPoints[i].getAttribute("lat");
-      const lon = trackPoints[i].getAttribute("lon");
+      const lat: string | null = trackPoints[i].getAttribute("lat");
+      const lon: string | null = trackPoints[i].getAttribute("lon");
 
-      latLngArray.push({ lat: parseFloat(lat), lng: parseFloat(lon) });
+      if (lat && lon) RoutePointsArray.push({ lat: parseFloat(lat), lng: parseFloat(lon) });
     }
 
-    return latLngArray;
+    return RoutePointsArray;
   } catch (error) {
     console.error("Error loading GPX:", error);
   }

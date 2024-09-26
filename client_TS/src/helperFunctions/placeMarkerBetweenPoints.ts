@@ -1,20 +1,31 @@
-// Function to calculate where the clicked point will land between the closest two points on the route
-export default function placeMarkerBetweenPoints(inputPoint, routePoint1, routePoint2) {
-  const [inputPointLat, inputPointLon] = inputPoint;
-  const [routePoint1Lat, routePoint1Lon] = routePoint1;
-  const [routePoint2Lat, routePoint2Lon] = routePoint2;
+import { RoutePoint } from "../types/route";
 
-  const lengthSquared = (routePoint2Lat - routePoint1Lat) ** 2 + (routePoint2Lon - routePoint1Lon) ** 2;
+// Function to calculate where the clicked point will land between the closest two points on the route
+export default function placeMarkerBetweenPoints(
+  inputPoint: RoutePoint,
+  routePoint1: RoutePoint,
+  routePoint2: RoutePoint
+) {
+  // const { lat: inputPoint.lat, lng: inputPoint.lng } = inputPoint;
+  // const { lat: routePoint1.lat, lng: routePoint1.lng } = routePoint1;
+  // const { lat: routePoint2.lat, lng: routePoint2.lng } = routePoint2;
+
+  const lengthSquared: number =
+    (routePoint2.lat - routePoint1.lat) ** 2 + (routePoint2.lng - routePoint1.lng) ** 2;
 
   // calculate how far along the route the input is
-  const relativePosition = ((inputPointLat - routePoint1Lat) * (routePoint2Lat - routePoint1Lat) + (inputPointLon - routePoint1Lon) * (routePoint2Lon - routePoint1Lon)) / lengthSquared;
+  const relativePosition =
+    ((inputPoint.lat - routePoint1.lat) * (routePoint2.lat - routePoint1.lat) +
+      (inputPoint.lng - routePoint1.lng) * (routePoint2.lng - routePoint1.lng)) /
+    lengthSquared;
 
   // Clamp the relative position to the range [0, 1] to make it a percentage along the segment
   const clampedRelativePosition = Math.max(0, Math.min(1, relativePosition));
 
   // Calculate the closest point for the input between the two points
-  const outputPointLat = routePoint1Lat + clampedRelativePosition * (routePoint2Lat - routePoint1Lat);
-  const outputPointLon = routePoint1Lon + clampedRelativePosition * (routePoint2Lon - routePoint1Lon);
+  const outputPoint: RoutePoint = { lat: 0, lng: 0 };
+  outputPoint.lat = routePoint1.lat + clampedRelativePosition * (routePoint2.lat - routePoint1.lat);
+  outputPoint.lng = routePoint1.lng + clampedRelativePosition * (routePoint2.lng - routePoint1.lng);
 
-  return [outputPointLat, outputPointLon];
+  return { lat: outputPoint.lat, lng: outputPoint.lng };
 }

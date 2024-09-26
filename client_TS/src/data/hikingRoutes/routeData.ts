@@ -1,7 +1,4 @@
-export interface RouteData {
-  type: string;
-  coordinates: number[][];
-}
+import { RouteData } from "../../types/route";
 
 export const routeData: RouteData = {
   type: "LineString",
