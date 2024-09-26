@@ -1,0 +1,35 @@
+.leaflet-control-container {
+  display: none;
+}
+
+.tripDetails {
+  position: absolute;
+  bottom: 50px;
+  left: 100px;
+  padding: 10px;
+  z-index: 5000;
+}
+
+.backpackMapImg {
+  position: absolute;
+  top: 5px;
+  left: 5px;
+  max-height: 15%;
+  max-width: 9%;
+  z-index: 5000;
+  width: auto;
+}
+
+.mapContainer {
+  height: 100%;
+  overflow: hidden;
+}
+.settings {
+  position: absolute;
+  bottom: 15px;
+  left: 15px;
+  max-height: 8%;
+  max-width: auto;
+  z-index: 5000;
+  cursor: pointer;
+}

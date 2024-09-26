@@ -1,0 +1,4 @@
+/* stop unused marker-shadow box from rendering */
+img[src="marker-shadow.png"] {
+  display: none !important;
+}
