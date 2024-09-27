@@ -2,26 +2,30 @@ import binarySearch from "./binarySearch";
 import { RoutePoint } from "../types/route";
 import placeMarkerBetweenPoints from "./placeMarkerBetweenPoints";
 import { buildKDTree, KDTreeNode, nearestNeighbor } from "./kdTree";
-import { gpxRouteData } from "../data/hikingRoutes/gpxRouteData";
-import { gpxRouteTree } from "../data/hikingRoutes/gpxRouteTree";
+import { gpxRouteData } from "../data/hikingRoutes/gpxRouteDataLong";
+import { gpxRouteTree } from "../data/hikingRoutes/gpxRouteTreeLongGPX";
+import createGPXArray from "./createGPXArray";
 
 //TODO Make the line more accurate on the longitude
 
 // Function to find the two closest points on the route to the clicked point
-function closestPoints(pointCoords: RoutePoint) {
+async function closestPoints(pointCoords: RoutePoint) {
   // Sort the route by longitude
 
   // !! This is not needed since kdTree is already strucuted and saved into .ts as json
   // // const route: RoutePoint[] = routeData.coordinates.map((a) => ({ lat: a[1], lng: a[0] })); // !! wrong order in routeData.ts
-  // const route: RoutePoint[] = gpxRouteData;  //gpxData with 2200 points
   // let sortedRoute: RoutePoint[] = route.sort((a, b) => a.lng - b.lng);
 
   // const { lat: targetLat, lng: targetLon } = pointCoords;
 
-  // const kdTree = buildKDTree(sortedRoute);
+  // const route: RoutePoint[] = gpxRouteData; //gpxData with 2200 points
+  // const route: RoutePoint[] | undefined = await createGPXArray("mapstogpxWHW.gpx");
+  const route: RoutePoint[] | undefined = await createGPXArray("WHW.gpx");
+  if (!route) throw new Error("WHW.gpx route has not points!");
+  const kdTree = buildKDTree(route);
   // console.log("kdTree:", JSON.stringify(kdTree));
+  // const kdTree: KDTreeNode = gpxRouteTree;
 
-  const kdTree: KDTreeNode = gpxRouteTree;
   const target = pointCoords;
   const nearest = nearestNeighbor(kdTree, target);
   if (nearest) {

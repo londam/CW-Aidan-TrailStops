@@ -4,14 +4,15 @@ import isMarkerBetweenRoutePoints from "./checkMarkerPosition";
 import { RoutePoint } from "../types/route";
 import { UserMarker } from "../types/userMarker";
 import { SettingsData } from "../types/settingsData";
+import { gpxRouteData } from "../data/hikingRoutes/gpxRouteDataLong";
 
 // loop through all points in route from index1 to index2 to calculate an accurate distance.
 function fullDistanceCalc(
-  markerDist: number,
-  routeArr: RoutePoint[],
-  routeIndex1: number,
-  routeIndex2: number,
-  distanceMeasureUnit: string
+  markerDist: number, //distance to previous or next point
+  routeArr: RoutePoint[], //array of all the points
+  routeIndex1: number, //starting point of this route segment (either first point in Route, or next point from previous marker)
+  routeIndex2: number, //ending point of this route segment
+  distanceMeasureUnit: string //distance unit
 ) {
   for (let i = routeIndex1; i < routeIndex2; i++) {
     markerDist += haversineDistanceCalc(routeArr[i], routeArr[i + 1], distanceMeasureUnit);
@@ -25,7 +26,9 @@ function walkingTimeCalc(markerDist: number, speed: number) {
 
 async function routeCalculation(markerArr: UserMarker[], calculationSettings: SettingsData) {
   const routeArr: RoutePoint[] | undefined = await createGPXArray("WHW.gpx");
+  // const routeArr: RoutePoint[] | undefined = await createGPXArray("mapstogpxWHW.gpx"); fetched from Google via https://mapstogpx.com/
   if (!routeArr) throw new Error("WHW.gpx route has not points!");
+  // const routeArr: RoutePoint[] = gpxRouteData;
   console.log("marker", markerArr[0]);
 
   let markerArrCopy = JSON.parse(JSON.stringify(markerArr));
@@ -34,10 +37,19 @@ async function routeCalculation(markerArr: UserMarker[], calculationSettings: Se
     // loop through markerArr
     for (let j = 0; j < routeArr.length - 1; j++) {
       // loop through routeArr
-      if (isMarkerBetweenRoutePoints(markerArrCopy[i], routeArr[j], routeArr[j + 1])) {
+      if (
+        markerArrCopy[i].position.lat === routeArr[j].lat &&
+        markerArrCopy[i].position.lng === routeArr[j].lng
+      ) {
         markerArrCopy[i].prevIndex = j;
         markerArrCopy[i].nextIndex = j + 1;
+        break;
       }
+      // if (isMarkerBetweenRoutePoints(markerArrCopy[i], routeArr[j], routeArr[j + 1])) {
+      //   markerArrCopy[i].prevIndex = j;
+      //   markerArrCopy[i].nextIndex = j + 1;
+      //   break;
+      // }
     }
   }
   // TODO implement both ways search
@@ -62,6 +74,7 @@ async function routeCalculation(markerArr: UserMarker[], calculationSettings: Se
   // calculate full distances between markers
   for (let i = 0; i < markerArrCopy.length; i++) {
     if (markerArrCopy.length === 1) {
+      //if only 1 marker
       markerArrCopy[i].prevDist.dist = fullDistanceCalc(
         markerArrCopy[i].prevDist.dist,
         routeArr,
@@ -77,6 +90,7 @@ async function routeCalculation(markerArr: UserMarker[], calculationSettings: Se
         calculationSettings.distance
       );
     } else if (i === 0) {
+      //if more markers and this is the first one
       markerArrCopy[i].prevDist.dist = fullDistanceCalc(
         markerArrCopy[i].prevDist.dist,
         routeArr,
@@ -92,6 +106,7 @@ async function routeCalculation(markerArr: UserMarker[], calculationSettings: Se
         calculationSettings.distance
       );
     } else if (i === markerArrCopy.length - 1) {
+      // if more markers and this is the last one
       markerArrCopy[i].prevDist.dist = fullDistanceCalc(
         markerArrCopy[i].prevDist.dist,
         routeArr,
@@ -107,6 +122,7 @@ async function routeCalculation(markerArr: UserMarker[], calculationSettings: Se
         calculationSettings.distance
       );
     } else {
+      // if more markers and this is nor first nor last
       markerArrCopy[i].prevDist.dist = fullDistanceCalc(
         markerArrCopy[i].prevDist.dist,
         routeArr,

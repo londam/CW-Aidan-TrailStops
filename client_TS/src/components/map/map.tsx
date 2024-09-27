@@ -65,7 +65,7 @@ const MapComponent = () => {
       click: async (e) => {
         // const { lat, lng } = e.latlng; // get position of click
         if (gpxRoute) {
-          const closestPoint = closestPoints(e.latlng); // snap clicked position to route
+          const closestPoint = await closestPoints(e.latlng); // snap clicked position to route
           const newMarker = {
             _id: uuidv4(),
             user_id: "aidan@test.com",
