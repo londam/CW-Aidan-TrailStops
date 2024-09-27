@@ -1,6 +1,6 @@
 export interface RouteData {
   type: string;
-  coordinates: number[][];
+  coordinates: RoutePoint[];
 }
 
 export interface RoutePoint {
