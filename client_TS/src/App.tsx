@@ -3,7 +3,6 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import ErrorPage from "./components/errorScreen/errorScreen";
 import LoginScreen from "./components/loginScreen/loginScreen";
 import RegisterScreen from "./components/registerScreen/registerScreen";
-import Settings from "./components/settings/settings";
 import "./App.css";
 
 // main app component, handles routing
@@ -22,11 +21,6 @@ function App() {
     {
       path: "/map",
       element: <Map />,
-    },
-    {
-      path: "/settings",
-      element: <Settings />,
-      errorElement: <ErrorPage />,
     },
   ]);
 
