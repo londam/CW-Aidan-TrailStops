@@ -164,7 +164,7 @@ async function routeCalculation(markerArr: UserMarker[], calculationSettings: Se
   }
 
   // change markers back to object
-  const output = markerArrCopy.reduce((acc, curr) => {
+  const output: { [key: string]: UserMarker } = markerArrCopy.reduce((acc, curr) => {
     acc[curr._id] = curr;
     return acc;
   }, {});

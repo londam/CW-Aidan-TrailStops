@@ -1,5 +1,5 @@
 export interface RouteData {
-  type: string;
+  //type: string;
   coordinates: RoutePoint[];
 }
 

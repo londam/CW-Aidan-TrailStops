@@ -15,6 +15,8 @@ import SearchResultScreen from "../searchResultScreen/searchResultScreen";
 import Settings from "../settings/settings";
 import TripDetailsScreen from "../tripDetailsScreen/tripDetailsScreen";
 import { SettingsData } from "../../types/settingsData";
+import { UserMarker } from "../../types/userMarker";
+import { RouteData, RoutePoint } from "../../types/route";
 
 // set icon for placed markers
 const defaultIcon = L.icon({
@@ -28,26 +30,30 @@ const defaultIcon = L.icon({
 const MapComponent = () => {
   const gpxFile = "/WHW.gpx";
   const [markers, setMarkers] = useState({});
-  const [gpxRoute, setGpxRoute] = useState([]);
-  const [selectedMarker, setSelectedMarker] = useState(null);
-  const [detailsClicked, setDetailsClicked] = useState(false);
-  const [settingsClicked, setSettingsClicked] = useState(false);
+  const [gpxRoute, setGpxRoute] = useState<RoutePoint[]>([]);
+  const [selectedMarker, setSelectedMarker] = useState<UserMarker | null>(null);
+  const [detailsClicked, setDetailsClicked] = useState<Boolean>(false);
+  const [settingsClicked, setSettingsClicked] = useState<Boolean>(false);
   const [settingsData, setSettingsData] = useState<SettingsData>({ distance: "km", speed: 3 });
 
-  const setGpxRouteFunc = (route) => {
+  const setGpxRouteFunc = (route: RoutePoint[]) => {
     setGpxRoute(route);
   };
 
   useEffect(() => {
-    DBService.getMarkers("aidan@test.com").then((data) => {
-      if (data) {
-        const dataOut = data.reduce((acc, curr) => {
-          acc[curr._id] = curr;
-          return acc;
-        }, {});
+    DBService.getMarkers("aidan@test.com").then((data: UserMarker[]) => {
+      if (Array.isArray(data) && data) {
+        const dataOut: { [key: string]: UserMarker } = data.reduce(
+          (acc: { [key: string]: UserMarker }, curr: UserMarker) => {
+            acc[curr._id] = curr;
+            return acc;
+          },
+          {}
+        );
         setMarkers(dataOut);
-        if (dataOut && Object.keys(dataOut).length > 0) {
-          const firstMarker = dataOut[Object.keys(dataOut)[0]];
+        const keys = Object.keys(dataOut);
+        if (keys.length > 0) {
+          const firstMarker: UserMarker = dataOut[keys[0]];
           if (firstMarker.walkingSpeed) {
             setSettingsData((prev) => ({
               ...prev,
@@ -65,8 +71,8 @@ const MapComponent = () => {
       click: async (e) => {
         // const { lat, lng } = e.latlng; // get position of click
         if (gpxRoute) {
-          const closestPoint = await closestPoints(e.latlng); // snap clicked position to route
-          const newMarker = {
+          const closestPoint: RoutePoint = await closestPoints(e.latlng); // snap clicked position to route
+          const newMarker: UserMarker = {
             _id: uuidv4(),
             user_id: "aidan@test.com",
             position: L.latLng([closestPoint.lat, closestPoint.lng]),
@@ -77,8 +83,11 @@ const MapComponent = () => {
             distanceMeasure: settingsData.distance,
           };
           // update markers state and add maker to database
-          let updatedMarkers = { ...markers, [newMarker._id]: newMarker };
-          const calculatedMarkers = await routeCalculation(
+          let updatedMarkers: { [key: string]: UserMarker } = {
+            ...markers,
+            [newMarker._id]: newMarker,
+          };
+          const calculatedMarkers: { [key: string]: UserMarker } = await routeCalculation(
             Object.values(updatedMarkers),
             settingsData
           );
@@ -100,7 +109,7 @@ const MapComponent = () => {
   };
 
   // handler for placed marker being clicked
-  const MarkerClickHandler = (marker) => {
+  const MarkerClickHandler = (marker: UserMarker) => {
     if (marker) {
       setSelectedMarker(marker);
     } else {
@@ -138,14 +147,19 @@ const MapComponent = () => {
         >
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
           <GPXLayer gpxFile={gpxFile} passRoute={setGpxRouteFunc} />
-          {Object.values(markers || {}).map((marker) => (
-            <Marker
-              key={marker._id}
-              position={[marker.position.lat, marker.position.lng]}
-              icon={defaultIcon}
-              eventHandlers={{ click: () => MarkerClickHandler(marker) }}
-            />
-          ))}
+          {Object.values(markers || {}).map((marker) => {
+            return (
+              <Marker
+                key={(marker as UserMarker)._id}
+                position={[
+                  (marker as UserMarker).position.lat,
+                  (marker as UserMarker).position.lng,
+                ]}
+                icon={defaultIcon}
+                eventHandlers={{ click: () => MarkerClickHandler(marker as UserMarker) }}
+              />
+            );
+          })}
           <MapClickHandler />
         </MapContainer>
         <img
@@ -223,7 +237,7 @@ const MapComponent = () => {
             closeOverlay={closeSettingsOverlay}
             settingsData={settingsData}
             setSettingsData={setSettingsData}
-            setSettingsClicked={setSettingsClicked}
+            // setSettingsClicked={setSettingsClicked}
             markers={markers}
             setMarkers={setMarkers}
           />

@@ -14,7 +14,7 @@ async function getMarkers(user_id) {
 async function addMarker(
   user_id: string,
   marker: UserMarker,
-  updatedMarkers: UserMarker[],
+  updatedMarkers: { [key: string]: UserMarker },
   settings: SettingsData
 ) {
   try {

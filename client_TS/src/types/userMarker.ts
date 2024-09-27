@@ -7,11 +7,11 @@ export interface UserMarker {
   _id: string;
   user_id: string;
   hotel: string;
-  order: number;
+  order?: number;
   walkingSpeed: number;
   distanceMeasure: string;
-  prevIndex: number;
-  nextIndex: number;
+  prevIndex?: number;
+  nextIndex?: number;
 }
 
 export interface Distance {
