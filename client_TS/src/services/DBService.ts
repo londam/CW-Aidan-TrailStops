@@ -1,10 +1,10 @@
 import { SettingsData } from "../types/settingsData";
 import { UserMarker } from "../types/userMarker";
 
-async function getMarkers(user_id) {
+async function getMarkers(user_id: string) {
   try {
-    const response = await fetch(`http://localhost:3001/mapMarkers?user_id=${user_id}`);
-    const data = await response.json();
+    const response: Response = await fetch(`http://localhost:3001/mapMarkers?user_id=${user_id}`);
+    const data: string = await response.json();
     return data;
   } catch (error) {
     console.log("Error fetching markers:", error);
@@ -39,7 +39,7 @@ async function addMarker(
   }
 }
 
-async function updateAllMarkers(markers) {
+async function updateAllMarkers(markers: { [key: string]: UserMarker }) {
   try {
     const response = await fetch("http://localhost:3001/updateAllMarkers", {
       method: "PUT",
@@ -55,7 +55,7 @@ async function updateAllMarkers(markers) {
   }
 }
 
-async function addUser(name, email, password) {
+async function addUser(name: string, email: string, password: string) {
   try {
     const response = await fetch("http://localhost:3001/user", {
       method: "POST",
@@ -71,7 +71,7 @@ async function addUser(name, email, password) {
   }
 }
 
-async function getUser(email) {
+async function getUser(email: string) {
   try {
     const response = await fetch(`http://localhost:3001/user?email=${email}`);
     const data = await response.json();
@@ -81,7 +81,7 @@ async function getUser(email) {
   }
 }
 
-async function getAccommodation(email, markerId) {
+async function getAccommodation(email: string, markerId: string) {
   try {
     const response = await fetch(
       `http://localhost:3001/accommodation?user_id=${email}&markerId=${markerId}`
@@ -94,7 +94,7 @@ async function getAccommodation(email, markerId) {
   }
 }
 
-async function addAccommodation(email, hotel, markerId) {
+async function addAccommodation(email: string, hotel: string, markerId: string) {
   try {
     const response = await fetch("http://localhost:3001/accommodation", {
       method: "PUT",
@@ -111,7 +111,7 @@ async function addAccommodation(email, hotel, markerId) {
   }
 }
 
-async function removeMarker(userId, markerId) {
+async function removeMarker(userId: string, markerId: string) {
   // TODO Fix bug where it marker is only delete after second attempt sometimes.
   try {
     const response = await fetch("http://localhost:3001/mapMarkers", {

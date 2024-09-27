@@ -41,7 +41,7 @@ const MapComponent = () => {
   };
 
   useEffect(() => {
-    DBService.getMarkers("aidan@test.com").then((data: UserMarker[]) => {
+    DBService.getMarkers("aidan@test.com").then((data: UserMarker[] | string | undefined) => {
       if (Array.isArray(data) && data) {
         const dataOut: { [key: string]: UserMarker } = data.reduce(
           (acc: { [key: string]: UserMarker }, curr: UserMarker) => {
