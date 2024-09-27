@@ -16,7 +16,7 @@ import Settings from "../settings/settings";
 import TripDetailsScreen from "../tripDetailsScreen/tripDetailsScreen";
 import { SettingsData } from "../../types/settingsData";
 import { UserMarker } from "../../types/userMarker";
-import { RouteData, RoutePoint } from "../../types/route";
+import { RoutePoint } from "../../types/route";
 
 // set icon for placed markers
 const defaultIcon = L.icon({
