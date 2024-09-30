@@ -1,6 +1,13 @@
-require("dotenv").config({ path: ".env" });
+import { Request, Response } from 'express';
+import fetch from 'node-fetch';
+import dotenv from 'dotenv';
 
-exports.getAccommodation = async (req, res) => {
+dotenv.config();
+
+export const getAccommodation = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const { lon, lat } = req.query;
     const apiKey = process.env.GOOGLE_API_KEY;
@@ -10,32 +17,37 @@ exports.getAccommodation = async (req, res) => {
     const data = await response.json();
     res.status(200).json(data);
   } catch (error) {
-    console.log(error);
-    res.status(500).send("Server Error");
+    console.error(error);
+    res.status(500).send('Server Error');
   }
 };
 
-exports.getAccommodationPic = async (req, res) => {
+export const getAccommodationPic = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const { photo_reference } = req.query;
     const apiKey = process.env.GOOGLE_API_KEY;
     const imageUrl = `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photo_reference=${photo_reference}&key=${apiKey}`;
-    console.log(imageUrl);
     const response = await fetch(imageUrl);
     if (response.ok) {
       res.status(200).json({ data: response.url });
     } else {
       const errorMessage = await response.text();
-      console.log("Error fetching image:", errorMessage);
-      res.status(404).send("Image not found");
+      console.error('Error fetching image:', errorMessage);
+      res.status(404).send('Image not found');
     }
   } catch (error) {
-    console.log(error);
-    res.status(500).send("Server Error");
+    console.error(error);
+    res.status(500).send('Server Error');
   }
 };
 
-exports.getAccomodationDetails = async (req, res) => {
+export const getAccommodationDetails = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const { place_id } = req.query;
     const apiKey = process.env.GOOGLE_API_KEY;
@@ -43,10 +55,9 @@ exports.getAccomodationDetails = async (req, res) => {
       `https://maps.googleapis.com/maps/api/place/details/json?key=${apiKey}&place_id=${place_id}`
     );
     const data = await response.json();
-    console.log("acc details:", data);
     res.status(200).json(data);
   } catch (error) {
-    console.log(error);
-    res.status(500).send("Server Error");
+    console.error(error);
+    res.status(500).send('Server Error');
   }
 };

@@ -1,4 +1,4 @@
-import { RoutePoint } from "../types/route";
+import { RoutePoint } from '../types/route';
 
 // Haversine formula to calculate distance between two coordinates on earth
 export default function haversineDistance(
@@ -14,14 +14,17 @@ export default function haversineDistance(
 
   const a =
     Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
-    Math.cos(lat1) * Math.cos(lat2) * Math.sin(deltaLng / 2) * Math.sin(deltaLng / 2);
+    Math.cos(lat1) *
+      Math.cos(lat2) *
+      Math.sin(deltaLng / 2) *
+      Math.sin(deltaLng / 2);
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
   const distInMeters = R * c;
 
-  if (distanceMeasureUnit === "km") {
+  if (distanceMeasureUnit === 'km') {
     return distInMeters / 1000; //kilometers conversion
-  } else if (distanceMeasureUnit === "m") {
+  } else if (distanceMeasureUnit === 'm') {
     return distInMeters / 1609.34; // miles conversion
   }
   throw new Error("Distance Measure Unit not 'km' or 'm'");

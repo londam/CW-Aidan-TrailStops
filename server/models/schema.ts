@@ -1,4 +1,4 @@
-const mongoose = require('./');
+import mongoose from './index.js';
 
 const Schema = mongoose.Schema;
 
@@ -13,16 +13,16 @@ const UserMarkersSchema = new mongoose.Schema({
   user_id: { type: String, required: true },
   position: {
     lat: { type: Number, required: true },
-    lng: { type: Number, required: true }
+    lng: { type: Number, required: true },
   },
-  hotel: { type: String }, 
+  hotel: { type: String },
   prevDist: {
     dist: { type: Number, required: true },
-    time: { type: Number, required: true }
-  }, 
+    time: { type: Number, required: true },
+  },
   nextDist: {
     dist: { type: Number, required: true },
-    time: { type: Number, required: true }
+    time: { type: Number, required: true },
   },
   order: { type: Number },
   walkingSpeed: { type: Number, required: true },
@@ -32,4 +32,4 @@ const UserMarkersSchema = new mongoose.Schema({
 const User = mongoose.model('User', userSchema);
 const UserMarkers = mongoose.model('UserMarkers', UserMarkersSchema);
 
-module.exports = { User, UserMarkers };
+export { User, UserMarkers };
