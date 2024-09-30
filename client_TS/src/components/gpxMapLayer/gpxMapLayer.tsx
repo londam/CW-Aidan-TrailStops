@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
-import { useMap, } from 'react-leaflet';
+import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet-gpx';
 import 'leaflet/dist/leaflet.css';
-import './gpxMapLayer.css'
+import './gpxMapLayer.css';
 
 // function to generate the route line on the map
-const GPXLayer = ({ gpxFile, passRoute}) => {
+const GPXLayer = ({ gpxFile, passRoute }) => {
   const map = useMap();
 
   useEffect(() => {
@@ -16,8 +16,8 @@ const GPXLayer = ({ gpxFile, passRoute}) => {
       async: true,
       polyline_options: {
         weight: 8,
-        color: '#c64242'
-      }
+        color: '#c64242',
+      },
     });
 
     gpx.addTo(map);
@@ -25,7 +25,6 @@ const GPXLayer = ({ gpxFile, passRoute}) => {
       const route = gpx.getLayers();
       passRoute(route);
       map.fitBounds(gpx.getBounds());
-
     });
 
     return () => {
