@@ -5,14 +5,19 @@ import 'leaflet-gpx';
 import 'leaflet/dist/leaflet.css';
 import './gpxMapLayer.css';
 
+interface GPXLayerProps {
+  gpxFile: any;
+  passRoute: (route: any) => void;
+}
+
 // function to generate the route line on the map
-const GPXLayer = ({ gpxFile, passRoute }) => {
+const GPXLayer: React.FC<GPXLayerProps> = ({ gpxFile, passRoute }) => {
   const map = useMap();
 
   useEffect(() => {
     if (!map) return;
     // line settings for rendering
-    const gpx = new L.GPX(gpxFile, {
+    const gpx: any = new L.GPX(gpxFile, {
       async: true,
       polyline_options: {
         weight: 8,
@@ -31,8 +36,8 @@ const GPXLayer = ({ gpxFile, passRoute }) => {
       map.removeLayer(gpx);
       map.attributionControl.setPrefix(''); // removes 'leaflet' corner link
     };
+    // }, [map, gpxFile, passRoute]);
   }, []);
-
   return null;
 };
 
