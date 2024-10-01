@@ -1,3 +1,5 @@
+//!! not needed any longer
+
 // check that the current marker falls between its surrounding route points
 
 import { RoutePoint } from "../types/route";

@@ -1,3 +1,5 @@
+//!! not needed any longer
+
 import { RoutePoint } from "../types/route";
 
 export default function binarySearch(

@@ -1,10 +1,8 @@
 import createGPXArray from "./createGPXArray";
 import haversineDistanceCalc from "./haversineDistanceCalc";
-import isMarkerBetweenRoutePoints from "./checkMarkerPosition";
 import { RoutePoint } from "../types/route";
 import { UserMarker } from "../types/userMarker";
 import { SettingsData } from "../types/settingsData";
-import { gpxRouteData } from "../data/hikingRoutes/gpxRouteDataLong";
 
 // loop through all points in route from index1 to index2 to calculate an accurate distance.
 function fullDistanceCalc(
@@ -17,8 +15,7 @@ function fullDistanceCalc(
   for (let i = routeIndex1; i < routeIndex2; i++) {
     markerDist += haversineDistanceCalc(routeArr[i], routeArr[i + 1], distanceMeasureUnit);
   }
-  // return Math.round(markerDist);
-  return markerDist;
+  return Math.round(markerDist * 100) / 100; // to round to 0.01km or 0.01mile
 }
 
 function walkingTimeCalc(markerDist: number, speed: number) {

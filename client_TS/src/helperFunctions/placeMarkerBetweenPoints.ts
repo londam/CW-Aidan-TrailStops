@@ -1,3 +1,5 @@
+//!! not needed any longer
+
 import { RoutePoint } from "../types/route";
 
 // Function to calculate where the clicked point will land between the closest two points on the route
