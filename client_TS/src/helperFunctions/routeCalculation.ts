@@ -1,10 +1,10 @@
-import createGPXArray from './createGPXArray';
-import haversineDistanceCalc from './haversineDistanceCalc';
-import isMarkerBetweenRoutePoints from './checkMarkerPosition';
-import { RoutePoint } from '../types/route';
-import { UserMarker } from '../types/userMarker';
-import { SettingsData } from '../types/settingsData';
-import { gpxRouteData } from '../data/hikingRoutes/gpxRouteDataLong';
+import createGPXArray from "./createGPXArray";
+import haversineDistanceCalc from "./haversineDistanceCalc";
+import isMarkerBetweenRoutePoints from "./checkMarkerPosition";
+import { RoutePoint } from "../types/route";
+import { UserMarker } from "../types/userMarker";
+import { SettingsData } from "../types/settingsData";
+import { gpxRouteData } from "../data/hikingRoutes/gpxRouteDataLong";
 
 // loop through all points in route from index1 to index2 to calculate an accurate distance.
 function fullDistanceCalc(
@@ -15,28 +15,22 @@ function fullDistanceCalc(
   distanceMeasureUnit: string //distance unit
 ) {
   for (let i = routeIndex1; i < routeIndex2; i++) {
-    markerDist += haversineDistanceCalc(
-      routeArr[i],
-      routeArr[i + 1],
-      distanceMeasureUnit
-    );
+    markerDist += haversineDistanceCalc(routeArr[i], routeArr[i + 1], distanceMeasureUnit);
   }
-  return Math.round(markerDist);
+  // return Math.round(markerDist);
+  return markerDist;
 }
 
 function walkingTimeCalc(markerDist: number, speed: number) {
   return Math.round(markerDist / speed);
 }
 
-async function routeCalculation(
-  markerArr: UserMarker[],
-  calculationSettings: SettingsData
-) {
-  const routeArr: RoutePoint[] | undefined = await createGPXArray('WHW.gpx');
+async function routeCalculation(markerArr: UserMarker[], calculationSettings: SettingsData) {
+  const routeArr: RoutePoint[] | undefined = await createGPXArray("WHW.gpx");
   // const routeArr: RoutePoint[] | undefined = await createGPXArray("mapstogpxWHW.gpx"); fetched from Google via https://mapstogpx.com/
-  if (!routeArr) throw new Error('WHW.gpx route has not points!');
+  if (!routeArr) throw new Error("WHW.gpx route has not points!");
   // const routeArr: RoutePoint[] = gpxRouteData;
-  console.log('marker', markerArr[0]);
+  console.log("marker", markerArr[0]);
 
   let markerArrCopy = JSON.parse(JSON.stringify(markerArr));
   // find where the markers fall between in the route
@@ -62,9 +56,7 @@ async function routeCalculation(
   // TODO implement both ways search
 
   // sort markerArrCopy to to be in order of prevIndex
-  markerArrCopy.sort(
-    (a: UserMarker, b: UserMarker) => a.prevIndex - b.prevIndex
-  );
+  markerArrCopy.sort((a: UserMarker, b: UserMarker) => a.prevIndex - b.prevIndex);
 
   // calculate prev and next distance for each marker to their prev and next route point
   for (let i = 0; i < markerArrCopy.length; i++) {
@@ -173,14 +165,11 @@ async function routeCalculation(
   }
 
   // change markers back to object
-  const output: { [key: string]: UserMarker } = markerArrCopy.reduce(
-    (acc, curr) => {
-      acc[curr._id] = curr;
-      return acc;
-    },
-    {}
-  );
-  console.log('output', output);
+  const output: { [key: string]: UserMarker } = markerArrCopy.reduce((acc, curr) => {
+    acc[curr._id] = curr;
+    return acc;
+  }, {});
+  console.log("output", output);
 
   return output;
 }
