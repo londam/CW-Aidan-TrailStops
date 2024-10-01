@@ -8,7 +8,7 @@ export default function haversineDistance(
 ): number {
   const R = 6371e3; // Radius of Earth in meters
   const lat1 = (coord1.lat * Math.PI) / 180;
-  const lat2 = (coord2.lat * Math.PI) / 180;
+  const lat2 = (coord2.lng * Math.PI) / 180;
   const deltaLat = ((coord2.lat - coord1.lat) * Math.PI) / 180;
   const deltaLng = ((coord2.lng - coord1.lng) * Math.PI) / 180;
 
