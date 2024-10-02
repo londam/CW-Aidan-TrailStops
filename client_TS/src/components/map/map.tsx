@@ -60,7 +60,7 @@ const MapComponent = () => {
         // const keys = Object.keys(dataOut);
         // if (keys.length > 0) {
         //   const firstMarker: UserMarker = dataOut[keys[0]];
-        if (data[0].walkingSpeed) {
+        if (data[0] && data[0].walkingSpeed) {
           setSettingsData((prev) => ({
             ...prev,
             speed: data[0].walkingSpeed,

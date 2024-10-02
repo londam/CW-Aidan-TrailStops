@@ -35,7 +35,7 @@ function SearchResultScreen({
       });
     }
     if (marker._id) {
-      DBService.getAccommodation("aidan@test.com", marker._id).then((hotel) => {
+      DBService.getAccommodation(userID, marker._id).then((hotel) => {
         if (hotel) {
           setSelectedAccommodation(hotel.hotel);
         } else {

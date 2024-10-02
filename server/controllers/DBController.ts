@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { User, UserMarkers } from "../models/schema.js";
+import { UserMarkersType } from "../models/types.js";
 
 export const getMarkers = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -16,7 +17,6 @@ export const getMarkers = async (req: Request, res: Response): Promise<void> => 
 export const addMarker = async (req: Request, res: Response): Promise<void> => {
   try {
     const { marker, updatedMarkers } = req.body;
-    // updatedMarkers should be [], not{}
 
     const newMarker = new UserMarkers({
       _id: marker._id,
@@ -33,13 +33,13 @@ export const addMarker = async (req: Request, res: Response): Promise<void> => {
 
     await newMarker.save();
 
-    const updatePromises = updatedMarkers.map(async (key: number) => {
+    const updatePromises = updatedMarkers.map(async (marker: UserMarkersType) => {
       return UserMarkers.findOneAndUpdate(
-        { _id: key },
+        { _id: marker._id },
         {
-          prevDist: updatedMarkers[key].prevDist,
-          nextDist: updatedMarkers[key].nextDist,
-          order: updatedMarkers[key].order,
+          prevDist: marker.prevDist,
+          nextDist: marker.nextDist,
+          order: marker.order,
         },
         { new: true }
       );
@@ -56,8 +56,8 @@ export const updateAllMarkers = async (req: Request, res: Response): Promise<voi
   try {
     const { markers } = req.body;
 
-    const updatePromises = markers.map(async (key: number) => {
-      return UserMarkers.updateOne({ _id: key }, markers[key]);
+    const updatePromises = markers.map(async (marker: UserMarkersType) => {
+      return UserMarkers.updateOne({ _id: marker._id }, marker);
     });
 
     await Promise.all(updatePromises);
