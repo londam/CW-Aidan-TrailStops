@@ -15,8 +15,6 @@ function DetailSummary({ markers }: DetailSummaryProps) {
     );
   }
 
-  const sortedMarkers = markers.sort((a, b) => a.order - b.order);
-
   return (
     <div className="detailSummary">
       <img
@@ -27,11 +25,11 @@ function DetailSummary({ markers }: DetailSummaryProps) {
       />
       <p>Start</p>
       <p className="emoji">&#128315;</p>
-      {sortedMarkers[0].prevDist ? (
+      {markers[0].prevDist ? (
         <>
           <p style={{ marginBottom: "0px" }}>
-            {sortedMarkers[0].prevDist.dist} kms/
-            {sortedMarkers[0].prevDist.time} hrs{" "}
+            {markers[0].prevDist.dist} kms/
+            {markers[0].prevDist.time} hrs{" "}
           </p>
           <p className="emoji">&#128315;</p>
         </>
@@ -39,8 +37,8 @@ function DetailSummary({ markers }: DetailSummaryProps) {
         "this div"
       )}
       <div className="summary">
-        {sortedMarkers.length > 0 ? (
-          sortedMarkers.map((marker) => (
+        {markers.length > 0 ? (
+          markers.map((marker) => (
             <div className="marker" key={marker._id}>
               <img className="markerIcon" src="map-pin.svg" alt="marker icon" />
               <p style={{ marginBottom: "0px" }}>{`Stop ${marker.order}`}</p>

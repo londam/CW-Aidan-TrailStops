@@ -49,24 +49,14 @@ const MapComponent = () => {
   useEffect(() => {
     DBService.getMarkers(userID, trailID).then((data: UserMarker[] | string | undefined) => {
       if (Array.isArray(data) && data) {
-        // const dataOut: UserMarker[] = data.reduce(
-        //   (acc: { [key: string]: UserMarker }, curr: UserMarker) => {
-        //     acc[curr._id] = curr;
-        //     return acc;
-        //   },
-        //   {}
-        // );
+        data.sort((a, b) => a.order - b.order);
         setMarkers(data);
-        // const keys = Object.keys(dataOut);
-        // if (keys.length > 0) {
-        //   const firstMarker: UserMarker = dataOut[keys[0]];
         if (data[0] && data[0].walkingSpeed) {
           setSettingsData((prev) => ({
             ...prev,
             speed: data[0].walkingSpeed,
           }));
         }
-        // }
       }
     });
   }, []);
@@ -75,7 +65,6 @@ const MapComponent = () => {
   const MapClickHandler = () => {
     useMapEvents({
       click: async (e) => {
-        // const { lat, lng } = e.latlng; // get position of click
         if (gpxRoute) {
           const closestPoint: RoutePoint = await closestPoints(e.latlng); // snap clicked position to route
           const newMarker: UserMarker = {
@@ -89,11 +78,6 @@ const MapComponent = () => {
             walkingSpeed: settingsData.speed,
             distanceMeasure: settingsData.distance,
           };
-          // update markers state and add maker to database
-          // let updatedMarkers: { [key: string]: UserMarker } = {
-          //   ...markers,
-          //   [newMarker._id]: newMarker,
-          // };
 
           let updatedMarkers: UserMarker[] = [...markers, newMarker];
 
