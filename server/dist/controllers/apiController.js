@@ -7,8 +7,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import fetch from 'node-fetch';
-import dotenv from 'dotenv';
+// import fetch from 'node-fetch-cjs';
+import dotenv from "dotenv";
 dotenv.config();
 export const getAccommodation = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -20,7 +20,7 @@ export const getAccommodation = (req, res) => __awaiter(void 0, void 0, void 0, 
     }
     catch (error) {
         console.error(error);
-        res.status(500).send('Server Error');
+        res.status(500).send("Server Error");
     }
 });
 export const getAccommodationPic = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -34,13 +34,13 @@ export const getAccommodationPic = (req, res) => __awaiter(void 0, void 0, void 
         }
         else {
             const errorMessage = yield response.text();
-            console.error('Error fetching image:', errorMessage);
-            res.status(404).send('Image not found');
+            console.error("Error fetching image:", errorMessage);
+            res.status(404).send("Image not found");
         }
     }
     catch (error) {
         console.error(error);
-        res.status(500).send('Server Error');
+        res.status(500).send("Server Error");
     }
 });
 export const getAccommodationDetails = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -53,6 +53,6 @@ export const getAccommodationDetails = (req, res) => __awaiter(void 0, void 0, v
     }
     catch (error) {
         console.error(error);
-        res.status(500).send('Server Error');
+        res.status(500).send("Server Error");
     }
 });

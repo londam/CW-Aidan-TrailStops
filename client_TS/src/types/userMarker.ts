@@ -12,6 +12,7 @@ export interface UserMarker {
   distanceMeasure: string;
   prevIndex?: number;
   nextIndex?: number;
+  trail_id: string;
 }
 
 export interface Distance {

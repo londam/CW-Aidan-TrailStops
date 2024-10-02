@@ -1,16 +1,11 @@
-import mongoose from './index.js';
+import mongoose from "./index.js";
 
 const Schema = mongoose.Schema;
-
-const userSchema = new Schema({
-  name: String,
-  email: String,
-  password: String,
-});
 
 const UserMarkersSchema = new mongoose.Schema({
   _id: { type: String, required: true },
   user_id: { type: String, required: true },
+  trail_id: { type: String, required: true },
   position: {
     lat: { type: Number, required: true },
     lng: { type: Number, required: true },
@@ -29,7 +24,18 @@ const UserMarkersSchema = new mongoose.Schema({
   distanceMeasure: { type: String, required: true },
 });
 
-const User = mongoose.model('User', userSchema);
-const UserMarkers = mongoose.model('UserMarkers', UserMarkersSchema);
+const TrailSchema = new Schema({
+  _id: { type: String, required: true },
+  name: { type: String, required: true },
+});
 
-export { User, UserMarkers };
+const userSchema = new Schema({
+  name: String,
+  email: String,
+  password: String,
+});
+
+const User = mongoose.model("User", userSchema);
+const UserMarkers = mongoose.model("UserMarkers", UserMarkersSchema);
+const Trail = mongoose.model("Trail", TrailSchema);
+export { User, UserMarkers, Trail };

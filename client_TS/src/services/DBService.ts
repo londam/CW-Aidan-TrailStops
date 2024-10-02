@@ -1,9 +1,11 @@
 import { SettingsData } from "../types/settingsData";
 import { UserMarker } from "../types/userMarker";
 
-async function getMarkers(user_id: string) {
+async function getMarkers(user_id: string, trail_id: string) {
   try {
-    const response: Response = await fetch(`http://localhost:3001/mapMarkers?user_id=${user_id}`);
+    const response: Response = await fetch(
+      `http://localhost:3001/mapMarkers?user_id=${user_id}?trail_id=${trail_id}`
+    );
     const data: string = await response.json();
     return data;
   } catch (error) {
@@ -25,11 +27,11 @@ async function addMarker(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        _id: _id,
-        user_id: user_id,
+        // _id: _id,  // it's already contained inside of marker!
+        // user_id: user_id, // it's already contained inside of marker!
         marker: marker,
         updatedMarkers: updatedMarkers,
-        settings: settings,
+        // settings: settings, // it's already contained inside of marker!
       }),
     });
     const data = await response.json();

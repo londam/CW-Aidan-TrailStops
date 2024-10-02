@@ -7,36 +7,37 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import { User, UserMarkers } from '../models/schema.js';
+import { User, UserMarkers } from "../models/schema.js";
 export const getMarkers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { user_id } = req.query;
-        const markers = yield UserMarkers.find({ user_id });
+        const { trail_id } = req.query;
+        const markers = yield UserMarkers.find({ userid: user_id, trail_id: trail_id });
         res.status(200).json(markers);
     }
     catch (error) {
-        res
-            .status(500)
-            .send(`Server Error in getMarkers: ${error.message}`);
+        res.status(500).send(`Server Error in getMarkers: ${error.message}`);
     }
 });
 export const addMarker = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { _id, user_id, marker, updatedMarkers, settings } = req.body;
-        const position = {
-            lat: marker.position.lat,
-            lng: marker.position.lng,
-        };
+        // const { _id, user_id, trail_id, marker, updatedMarkers, settings } = req.body;
+        const { marker, updatedMarkers } = req.body;
+        // const position = {
+        //   lat: marker.position.lat,
+        //   lng: marker.position.lng,
+        // };
         const newMarker = new UserMarkers({
-            _id,
-            user_id,
-            position,
+            _id: marker._id,
+            user_id: marker.user_id,
+            position: marker.position,
+            trail_id: marker.trail_id,
             hotel: marker.hotel,
             nextDist: marker.nextDist,
             prevDist: marker.prevDist,
             order: marker.order,
-            walkingSpeed: settings.speed,
-            distanceMeasure: settings.distance,
+            walkingSpeed: marker.walkingSpeed,
+            distanceMeasure: marker.distanceMeasure,
         });
         yield newMarker.save();
         const updatePromises = Object.keys(updatedMarkers).map((key) => __awaiter(void 0, void 0, void 0, function* () {
@@ -50,9 +51,7 @@ export const addMarker = (req, res) => __awaiter(void 0, void 0, void 0, functio
         res.status(200).json(newMarker);
     }
     catch (error) {
-        res
-            .status(500)
-            .send(`Server Error in addMarker: ${error.message}`);
+        res.status(500).send(`Server Error in addMarker: ${error.message}`);
     }
 });
 export const updateAllMarkers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -62,12 +61,10 @@ export const updateAllMarkers = (req, res) => __awaiter(void 0, void 0, void 0, 
             return UserMarkers.updateOne({ _id: key }, markers[key]);
         }));
         yield Promise.all(updatePromises);
-        res.status(200).json('Markers updated successfully');
+        res.status(200).json("Markers updated successfully");
     }
     catch (error) {
-        res
-            .status(500)
-            .send(`Server Error in updateAllMarkers: ${error.message}`);
+        res.status(500).send(`Server Error in updateAllMarkers: ${error.message}`);
     }
 });
 export const removeMarker = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -77,9 +74,7 @@ export const removeMarker = (req, res) => __awaiter(void 0, void 0, void 0, func
         res.status(200).json(response);
     }
     catch (error) {
-        res
-            .status(500)
-            .send(`Server Error in removeMarker: ${error.message}`);
+        res.status(500).send(`Server Error in removeMarker: ${error.message}`);
     }
 });
 export const addUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -90,9 +85,7 @@ export const addUser = (req, res) => __awaiter(void 0, void 0, void 0, function*
         res.status(200).json(response);
     }
     catch (error) {
-        res
-            .status(500)
-            .send(`Server Error in addUser: ${error.message}`);
+        res.status(500).send(`Server Error in addUser: ${error.message}`);
     }
 });
 export const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -100,16 +93,14 @@ export const getUser = (req, res) => __awaiter(void 0, void 0, void 0, function*
         const { email } = req.query;
         const user = yield User.findOne({ email });
         if (!user) {
-            res.status(404).send('User not found');
+            res.status(404).send("User not found");
         }
         else {
             res.status(200).json(user);
         }
     }
     catch (error) {
-        res
-            .status(500)
-            .send(`Server Error in getUser: ${error.message}`);
+        res.status(500).send(`Server Error in getUser: ${error.message}`);
     }
 });
 export const getAccommodation = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -117,16 +108,14 @@ export const getAccommodation = (req, res) => __awaiter(void 0, void 0, void 0, 
         const { user_id, markerId } = req.query;
         const accommodation = yield UserMarkers.findOne({ user_id, _id: markerId });
         if (!accommodation) {
-            res.status(404).send('Accommodation not found');
+            res.status(404).send("Accommodation not found");
         }
         else {
             res.status(200).json(accommodation);
         }
     }
     catch (error) {
-        res
-            .status(500)
-            .send(`Server Error in getAccommodation: ${error.message}`);
+        res.status(500).send(`Server Error in getAccommodation: ${error.message}`);
     }
 });
 export const addAccommodation = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -136,8 +125,6 @@ export const addAccommodation = (req, res) => __awaiter(void 0, void 0, void 0, 
         res.status(200).json(response);
     }
     catch (error) {
-        res
-            .status(500)
-            .send(`Server Error in addAccommodation: ${error.message}`);
+        res.status(500).send(`Server Error in addAccommodation: ${error.message}`);
     }
 });
