@@ -18,6 +18,9 @@ import { SettingsData } from "../../types/settingsData";
 import { UserMarker } from "../../types/userMarker";
 import { RoutePoint } from "../../types/route";
 
+const userID = "66f5228c61b5d88b81ec241c";
+const trailID = "WHW_default";
+
 // set icon for placed markers
 const defaultIcon = L.icon({
   iconUrl: "/map-pin.svg",
@@ -29,7 +32,7 @@ const defaultIcon = L.icon({
 
 const MapComponent = () => {
   const gpxFile = "/WHW.gpx";
-  const [markers, setMarkers] = useState({});
+  const [markers, setMarkers] = useState<UserMarker[]>([]);
   const [gpxRoute, setGpxRoute] = useState<RoutePoint[]>([]);
   const [selectedMarker, setSelectedMarker] = useState<UserMarker | null>(null);
   const [detailsClicked, setDetailsClicked] = useState<Boolean>(false);
@@ -44,26 +47,26 @@ const MapComponent = () => {
   };
 
   useEffect(() => {
-    DBService.getMarkers("aidan@test.com").then((data: UserMarker[] | string | undefined) => {
+    DBService.getMarkers(userID, trailID).then((data: UserMarker[] | string | undefined) => {
       if (Array.isArray(data) && data) {
-        const dataOut: { [key: string]: UserMarker } = data.reduce(
-          (acc: { [key: string]: UserMarker }, curr: UserMarker) => {
-            acc[curr._id] = curr;
-            return acc;
-          },
-          {}
-        );
-        setMarkers(dataOut);
-        const keys = Object.keys(dataOut);
-        if (keys.length > 0) {
-          const firstMarker: UserMarker = dataOut[keys[0]];
-          if (firstMarker.walkingSpeed) {
-            setSettingsData((prev) => ({
-              ...prev,
-              speed: firstMarker.walkingSpeed,
-            }));
-          }
+        // const dataOut: UserMarker[] = data.reduce(
+        //   (acc: { [key: string]: UserMarker }, curr: UserMarker) => {
+        //     acc[curr._id] = curr;
+        //     return acc;
+        //   },
+        //   {}
+        // );
+        setMarkers(data);
+        // const keys = Object.keys(dataOut);
+        // if (keys.length > 0) {
+        //   const firstMarker: UserMarker = dataOut[keys[0]];
+        if (data[0].walkingSpeed) {
+          setSettingsData((prev) => ({
+            ...prev,
+            speed: data[0].walkingSpeed,
+          }));
         }
+        // }
       }
     });
   }, []);
@@ -77,7 +80,8 @@ const MapComponent = () => {
           const closestPoint: RoutePoint = await closestPoints(e.latlng); // snap clicked position to route
           const newMarker: UserMarker = {
             _id: uuidv4(),
-            user_id: "aidan@test.com",
+            user_id: userID,
+            trail_id: trailID,
             position: L.latLng([closestPoint.lat, closestPoint.lng]),
             hotel: "",
             prevDist: { dist: 0, time: 0 },
@@ -86,24 +90,22 @@ const MapComponent = () => {
             distanceMeasure: settingsData.distance,
           };
           // update markers state and add maker to database
-          let updatedMarkers: { [key: string]: UserMarker } = {
-            ...markers,
-            [newMarker._id]: newMarker,
-          };
-          const calculatedMarkers: { [key: string]: UserMarker } = await routeCalculation(
-            Object.values(updatedMarkers),
+          // let updatedMarkers: { [key: string]: UserMarker } = {
+          //   ...markers,
+          //   [newMarker._id]: newMarker,
+          // };
+
+          let updatedMarkers: UserMarker[] = [...markers, newMarker];
+
+          const calculatedMarkers: UserMarker[] = await routeCalculation(
+            updatedMarkers,
             settingsData
           );
           setMarkers(calculatedMarkers);
-          DBService.addMarker(
-            "aidan@test.com",
-            calculatedMarkers[newMarker._id],
-            calculatedMarkers,
-            settingsData
-          );
+          DBService.addMarker(newMarker, calculatedMarkers);
           // timeout to make sure point is added to state.
           setTimeout(() => {
-            setSelectedMarker(calculatedMarkers[newMarker._id]);
+            setSelectedMarker(newMarker);
           }, 100);
         }
       },
@@ -219,6 +221,7 @@ const MapComponent = () => {
             markers={markers}
             setMarkers={setMarkers}
             closeOverlay={closeSearchOverlay}
+            settingsData={settingsData}
           />
         </div>
       )}

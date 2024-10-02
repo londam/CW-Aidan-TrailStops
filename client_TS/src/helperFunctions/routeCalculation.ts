@@ -30,7 +30,7 @@ async function routeCalculation(markerArr: UserMarker[], calculationSettings: Se
   console.log("marker", markerArr[0]);
 
   let markerArrCopy = JSON.parse(JSON.stringify(markerArr));
-  // find where the markers fall between in the route
+  // find where the markers fall on dots in the route
   for (let i = 0; i < markerArrCopy.length; i++) {
     // loop through markerArr
     for (let j = 0; j < routeArr.length - 1; j++) {
@@ -43,11 +43,6 @@ async function routeCalculation(markerArr: UserMarker[], calculationSettings: Se
         markerArrCopy[i].nextIndex = j + 1;
         break;
       }
-      // if (isMarkerBetweenRoutePoints(markerArrCopy[i], routeArr[j], routeArr[j + 1])) {
-      //   markerArrCopy[i].prevIndex = j;
-      //   markerArrCopy[i].nextIndex = j + 1;
-      //   break;
-      // }
     }
   }
   // TODO implement both ways search
@@ -160,6 +155,8 @@ async function routeCalculation(markerArr: UserMarker[], calculationSettings: Se
   for (let i = 0; i < markerArrCopy.length; i++) {
     markerArrCopy[i].order = i + 1;
   }
+
+  return markerArrCopy;
 
   // change markers back to object
   const output: { [key: string]: UserMarker } = markerArrCopy.reduce((acc, curr) => {

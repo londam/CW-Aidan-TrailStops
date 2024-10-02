@@ -2,7 +2,8 @@ import "./detailSummary.css";
 import { UserMarker } from "../../types/userMarker";
 
 interface DetailSummaryProps {
-  markers: { [key: string]: UserMarker };
+  // markers: { [key: string]: UserMarker };
+  markers: UserMarker[];
 }
 
 function DetailSummary({ markers }: DetailSummaryProps) {
@@ -14,7 +15,7 @@ function DetailSummary({ markers }: DetailSummaryProps) {
     );
   }
 
-  const sortedMarkers = Object.values(markers).sort((a, b) => a.order - b.order);
+  const sortedMarkers = markers.sort((a, b) => a.order - b.order);
 
   return (
     <div className="detailSummary">

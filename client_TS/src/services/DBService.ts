@@ -4,7 +4,7 @@ import { UserMarker } from "../types/userMarker";
 async function getMarkers(user_id: string, trail_id: string) {
   try {
     const response: Response = await fetch(
-      `http://localhost:3001/mapMarkers?user_id=${user_id}?trail_id=${trail_id}`
+      `http://localhost:3001/mapMarkers?user_id=${user_id}&trail_id=${trail_id}`
     );
     const data: string = await response.json();
     return data;
@@ -13,7 +13,7 @@ async function getMarkers(user_id: string, trail_id: string) {
   }
 }
 
-async function addMarker(marker: UserMarker, updatedMarkers: { [key: string]: UserMarker }) {
+async function addMarker(marker: UserMarker, updatedMarkers: UserMarker[]) {
   try {
     const response = await fetch("http://localhost:3001/mapMarkers", {
       method: "POST",

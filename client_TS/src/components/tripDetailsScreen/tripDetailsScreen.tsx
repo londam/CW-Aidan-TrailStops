@@ -1,19 +1,12 @@
 // import { useEffect } from 'react';
-import './tripDetailsScreen.css';
-import { Button } from '@mui/material';
-
-interface MarkerData {
-  _id: string;
-  order?: number;
-  hotel: string;
-  prevDist: { dist: number; time: number };
-  nextDist: { dist: number; time: number };
-}
+import { UserMarker } from "../../types/userMarker";
+import "./tripDetailsScreen.css";
+import { Button } from "@mui/material";
 
 interface TripDetailsScreenProps {
   closeOverlay: () => void;
-  markers: Record<string, MarkerData>;
-  setSelectedMarker: (marker: MarkerData) => void;
+  markers: UserMarker[];
+  setSelectedMarker: (marker: UserMarker) => void;
 }
 
 const TripDetailsScreen: React.FC<TripDetailsScreenProps> = ({
@@ -21,20 +14,16 @@ const TripDetailsScreen: React.FC<TripDetailsScreenProps> = ({
   markers = {},
   setSelectedMarker,
 }) => {
-  const firstMarker = Object.values(markers).find(
-    (marker) => marker.order === 1
-  ) || {
+  const firstMarker = Object.values(markers).find((marker) => marker.order === 1) || {
     prevDist: { dist: 0, time: 0 },
   };
 
-  const sortedMarkers = Object.values(markers).sort(
-    (a, b) => (a.order || 0) - (b.order || 0)
-  );
+  const sortedMarkers = Object.values(markers).sort((a, b) => (a.order || 0) - (b.order || 0));
 
   return (
     <div className="tripDetailsScreen">
       <h1>Trip Details</h1>
-      <ul className="tripDetailsList" style={{ justifyContent: 'flex-start' }}>
+      <ul className="tripDetailsList" style={{ justifyContent: "flex-start" }}>
         <li>
           Start point
           <br />
@@ -45,8 +34,7 @@ const TripDetailsScreen: React.FC<TripDetailsScreenProps> = ({
 
         {sortedMarkers.map((marker) => (
           <li className="Item" key={marker._id}>
-            Stop {marker.order ?? 'Unknown'}:{' '}
-            {marker.hotel || 'No Accommodation Selected'}
+            Stop {marker.order ?? "Unknown"}: {marker.hotel || "No Accommodation Selected"}
             <br />
             Distance to next stop: {marker.nextDist?.dist ?? 0} km
             <br />

@@ -1,23 +1,17 @@
-import './settings.css';
-import {
-  Select,
-  FormControl,
-  Button,
-  MenuItem,
-  SelectChangeEvent,
-} from '@mui/material';
-import DBService from '../../services/DBService';
-import routeCalculation from '../../helperFunctions/routeCalculation';
-import { useEffect } from 'react';
-import { SettingsData } from '../../types/settingsData';
+import "./settings.css";
+import { Select, FormControl, Button, MenuItem, SelectChangeEvent } from "@mui/material";
+import DBService from "../../services/DBService";
+import routeCalculation from "../../helperFunctions/routeCalculation";
+import { useEffect } from "react";
+import { SettingsData } from "../../types/settingsData";
+import { UserMarker } from "../../types/userMarker";
 
 interface SettingsProps {
   closeOverlay: () => void;
   settingsData: SettingsData;
   setSettingsData: (data: SettingsData) => void;
-  setSettingsClicked: (clicked: boolean) => void;
-  markers: Record<string, any>;
-  setMarkers: (markers: Record<string, any>) => void;
+  markers: UserMarker[];
+  setMarkers: (markers: UserMarker[]) => void;
 }
 
 function Settings({
@@ -31,10 +25,7 @@ function Settings({
   useEffect(() => {
     const updateMarkers = async () => {
       if (settingsData.speed !== undefined) {
-        const updatedMarkers = await routeCalculation(
-          Object.values(markers),
-          settingsData
-        );
+        const updatedMarkers = await routeCalculation(Object.values(markers), settingsData);
         DBService.updateAllMarkers(updatedMarkers);
         setMarkers(updatedMarkers);
       }
@@ -48,9 +39,7 @@ function Settings({
 
   // commented for now
 
-  const changeDistanceSetting = async (
-    event: React.ChangeEvent<{ value: unknown }>
-  ) => {
+  const changeDistanceSetting = async (event: React.ChangeEvent<{ value: unknown }>) => {
     setSettingsData({ ...settingsData, distance: String(event.target.value) });
     const updatedMarkers = await routeCalculation(Object.values(markers), {
       ...settingsData,
@@ -61,9 +50,9 @@ function Settings({
   };
 
   return (
-    <div style={{ marginBottom: '10px' }} className="settingsScreen">
+    <div style={{ marginBottom: "10px" }} className="settingsScreen">
       <h1>Settings</h1>
-      <form style={{ marginBottom: '10px' }}>
+      <form style={{ marginBottom: "10px" }}>
         <FormControl>
           <Select value={settingsData.speed} onChange={changeSpeedSetting}>
             <MenuItem value={2}>2Kmph - Slow</MenuItem>
