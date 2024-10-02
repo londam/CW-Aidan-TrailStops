@@ -1,4 +1,3 @@
-import { SettingsData } from "../types/settingsData";
 import { UserMarker } from "../types/userMarker";
 
 async function getMarkers(user_id: string, trail_id: string) {
@@ -25,12 +24,6 @@ async function addMarker(marker: UserMarker, updatedMarkers: UserMarker[]) {
         updatedMarkers: updatedMarkers,
       }),
     });
-    console.log(
-      JSON.stringify({
-        marker: marker,
-        updatedMarkers: updatedMarkers,
-      })
-    );
     const data = await response.json();
     return data;
   } catch (error) {

@@ -5,6 +5,7 @@ import routeCalculation from "../../helperFunctions/routeCalculation";
 import { useEffect } from "react";
 import { SettingsData } from "../../types/settingsData";
 import { UserMarker } from "../../types/userMarker";
+import { TrailRoute } from "../map/map";
 
 interface SettingsProps {
   closeOverlay: () => void;
@@ -12,6 +13,7 @@ interface SettingsProps {
   setSettingsData: (data: SettingsData) => void;
   markers: UserMarker[];
   setMarkers: (markers: UserMarker[]) => void;
+  selectedTrailRoute: TrailRoute;
 }
 
 function Settings({
@@ -20,12 +22,17 @@ function Settings({
   setSettingsData,
   markers,
   setMarkers,
+  selectedTrailRoute,
 }: SettingsProps) {
   // Effect to handle updates based on settingsData changes
   useEffect(() => {
     const updateMarkers = async () => {
       if (settingsData.speed !== undefined) {
-        const updatedMarkers = await routeCalculation(Object.values(markers), settingsData);
+        const updatedMarkers = await routeCalculation(
+          Object.values(markers),
+          settingsData,
+          selectedTrailRoute.gpxFile
+        );
         DBService.updateAllMarkers(updatedMarkers);
         setMarkers(updatedMarkers);
       }

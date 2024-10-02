@@ -22,11 +22,13 @@ function walkingTimeCalc(markerDist: number, speed: number) {
   return Math.round(markerDist / speed);
 }
 
-async function routeCalculation(markerArr: UserMarker[], calculationSettings: SettingsData) {
-  const routeArr: RoutePoint[] | undefined = await createGPXArray("WHW.gpx");
-  // const routeArr: RoutePoint[] | undefined = await createGPXArray("mapstogpxWHW.gpx"); fetched from Google via https://mapstogpx.com/
-  if (!routeArr) throw new Error("WHW.gpx route has not points!");
-  // const routeArr: RoutePoint[] = gpxRouteData;
+async function routeCalculation(
+  markerArr: UserMarker[],
+  calculationSettings: SettingsData,
+  selectedTrailRouteGPX: string
+) {
+  const routeArr: RoutePoint[] | undefined = await createGPXArray(selectedTrailRouteGPX);
+  if (!routeArr) throw new Error(`${selectedTrailRouteGPX} route has not points!`);
   console.log("marker", markerArr[0]);
 
   let markerArrCopy = JSON.parse(JSON.stringify(markerArr));
@@ -48,7 +50,7 @@ async function routeCalculation(markerArr: UserMarker[], calculationSettings: Se
   // TODO implement both ways search
 
   // sort markerArrCopy to to be in order of prevIndex
-  markerArrCopy.sort((a: UserMarker, b: UserMarker) => a.prevIndex - b.prevIndex);
+  markerArrCopy.sort((a: UserMarker, b: UserMarker) => a.prevIndex! - b.prevIndex!);
 
   // calculate prev and next distance for each marker to their prev and next route point
   for (let i = 0; i < markerArrCopy.length; i++) {
@@ -157,15 +159,6 @@ async function routeCalculation(markerArr: UserMarker[], calculationSettings: Se
   }
 
   return markerArrCopy;
-
-  // change markers back to object
-  const output: { [key: string]: UserMarker } = markerArrCopy.reduce((acc, curr) => {
-    acc[curr._id] = curr;
-    return acc;
-  }, {});
-  console.log("output", output);
-
-  return output;
 }
 
 export default routeCalculation;

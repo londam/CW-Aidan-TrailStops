@@ -1,5 +1,6 @@
 // import { useEffect } from 'react';
 import { UserMarker } from "../../types/userMarker";
+import { TrailRoute } from "../map/map";
 import "./tripDetailsScreen.css";
 import { Button } from "@mui/material";
 

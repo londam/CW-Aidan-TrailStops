@@ -6,6 +6,7 @@ import { Button } from "@mui/material";
 import routeCalculation from "../../helperFunctions/routeCalculation";
 import { UserMarker } from "../../types/userMarker";
 import { SettingsData } from "../../types/settingsData";
+import { TrailRoute } from "../map/map";
 
 const userID = "66f5228c61b5d88b81ec241c";
 
@@ -15,6 +16,7 @@ interface SearchResultScreenProps {
   markers: UserMarker[];
   setMarkers: (markers: UserMarker[]) => void;
   settingsData: SettingsData;
+  selectedTrailRoute: TrailRoute;
 }
 
 function SearchResultScreen({
@@ -23,6 +25,7 @@ function SearchResultScreen({
   markers,
   setMarkers,
   settingsData,
+  selectedTrailRoute,
 }: SearchResultScreenProps) {
   const [nearAccommodation, setNearAccommodation] = useState<any[]>([]);
   const [selectedAccommodation, setSelectedAccommodation] = useState("");
@@ -76,7 +79,11 @@ function SearchResultScreen({
     }));
 
     //and then calculate it again
-    const calculatedMarkers = await routeCalculation(enrichedMarkers, settingsData);
+    const calculatedMarkers = await routeCalculation(
+      enrichedMarkers,
+      settingsData,
+      selectedTrailRoute.gpxFile
+    );
 
     setMarkers(calculatedMarkers);
 

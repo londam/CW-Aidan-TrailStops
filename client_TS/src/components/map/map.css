@@ -26,10 +26,19 @@
 }
 .settings {
   position: absolute;
-  bottom: 15px;
-  left: 15px;
-  max-height: 8%;
+  bottom: 50px;
+  left: -100px;
+  height: 100px;
   max-width: auto;
   z-index: 5000;
   cursor: pointer;
+}
+
+.route-selector {
+  position: fixed;
+  top: -20vh;
+  max-height: 15%;
+  max-width: 25%;
+  z-index: 6000;
+  width: auto;
 }

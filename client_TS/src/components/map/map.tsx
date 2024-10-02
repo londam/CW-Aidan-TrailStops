@@ -9,7 +9,7 @@ import DBService from "../../services/DBService";
 import { v4 as uuidv4 } from "uuid";
 import "leaflet-gpx";
 import "leaflet/dist/leaflet.css";
-import { Button } from "@mui/material";
+import { Button, FormControl, InputLabel, MenuItem, Select } from "@mui/material";
 import DetailSummary from "../detailSummary/detailSummary";
 import SearchResultScreen from "../searchResultScreen/searchResultScreen";
 import Settings from "../settings/settings";
@@ -19,7 +19,6 @@ import { UserMarker } from "../../types/userMarker";
 import { RoutePoint } from "../../types/route";
 
 const userID = "66f5228c61b5d88b81ec241c";
-const trailID = "WHW_default";
 
 // set icon for placed markers
 const defaultIcon = L.icon({
@@ -30,8 +29,26 @@ const defaultIcon = L.icon({
   shadowSize: [41, 41],
 });
 
+export interface TrailRoute {
+  trail_id: string;
+  gpxFile: string;
+  name: string;
+}
+
 const MapComponent = () => {
-  const gpxFile = "/WHW.gpx";
+  const trailRoutes: TrailRoute[] = [
+    {
+      trail_id: "WHW_default",
+      gpxFile: "/WHW.gpx",
+      name: "Aidan's Favourite WHW Route",
+    },
+    {
+      trail_id: "WHW_mapstogpxWHW",
+      gpxFile: "/mapstogpxWHW.gpx",
+      name: "Better WHW Route :)",
+    },
+  ];
+  const [selectedTrailRoute, setSelectedTrailRoute] = useState<TrailRoute>(trailRoutes[0]);
   const [markers, setMarkers] = useState<UserMarker[]>([]);
   const [gpxRoute, setGpxRoute] = useState<RoutePoint[]>([]);
   const [selectedMarker, setSelectedMarker] = useState<UserMarker | null>(null);
@@ -47,30 +64,35 @@ const MapComponent = () => {
   };
 
   useEffect(() => {
-    DBService.getMarkers(userID, trailID).then((data: UserMarker[] | string | undefined) => {
-      if (Array.isArray(data) && data) {
-        data.sort((a, b) => a.order - b.order);
-        setMarkers(data);
-        if (data[0] && data[0].walkingSpeed) {
-          setSettingsData((prev) => ({
-            ...prev,
-            speed: data[0].walkingSpeed,
-          }));
+    DBService.getMarkers(userID, selectedTrailRoute.trail_id).then(
+      (data: UserMarker[] | string | undefined) => {
+        if (Array.isArray(data) && data) {
+          data.sort((a, b) => a.order - b.order);
+          setMarkers(data);
+          if (data[0] && data[0].walkingSpeed) {
+            setSettingsData((prev) => ({
+              ...prev,
+              speed: data[0].walkingSpeed,
+            }));
+          }
         }
       }
-    });
-  }, []);
+    );
+  }, [selectedTrailRoute]);
 
   // handler from marker being added to map
   const MapClickHandler = () => {
     useMapEvents({
       click: async (e) => {
         if (gpxRoute) {
-          const closestPoint: RoutePoint = await closestPoints(e.latlng); // snap clicked position to route
+          const closestPoint: RoutePoint = await closestPoints(
+            e.latlng,
+            selectedTrailRoute.gpxFile
+          ); // snap clicked position to route
           const newMarker: UserMarker = {
             _id: uuidv4(),
             user_id: userID,
-            trail_id: trailID,
+            trail_id: selectedTrailRoute.trail_id,
             position: L.latLng([closestPoint.lat, closestPoint.lng]),
             hotel: "",
             prevDist: { dist: 0, time: 0 },
@@ -83,7 +105,8 @@ const MapComponent = () => {
 
           const calculatedMarkers: UserMarker[] = await routeCalculation(
             updatedMarkers,
-            settingsData
+            settingsData,
+            selectedTrailRoute.gpxFile
           );
           setMarkers(calculatedMarkers);
           DBService.addMarker(newMarker, calculatedMarkers);
@@ -123,6 +146,11 @@ const MapComponent = () => {
     setSettingsClicked(false); // Hide the overlay
   };
 
+  const onSelectedTrailRouteChange = (trail_id: string) => {
+    const selectedTrail = trailRoutes.find((trailRoute) => trailRoute.trail_id === trail_id);
+    if (selectedTrail) setSelectedTrailRoute(selectedTrail || null); // Set the full object
+  };
+
   return (
     <>
       <div className="mapContainer">
@@ -135,7 +163,11 @@ const MapComponent = () => {
           touchZoom={!selectedMarker}
         >
           <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
-          <GPXLayer gpxFile={gpxFile} passRoute={setGpxRouteFunc} />
+          <GPXLayer
+            gpxFile={selectedTrailRoute.gpxFile}
+            passRoute={setGpxRouteFunc}
+            passTrail={selectedTrailRoute}
+          />
           {Object.values(markers || {}).map((marker) => {
             return (
               <Marker
@@ -158,13 +190,27 @@ const MapComponent = () => {
           src="backpack.png"
           alt="brown backpack open at the front showing a wilderness scene inside"
         />
+        <FormControl className="route-selector" variant="filled">
+          <InputLabel id="route-select-label">Select Route</InputLabel>
+          <Select
+            labelId="route-select-label"
+            value={selectedTrailRoute.trail_id}
+            onChange={(e) => onSelectedTrailRouteChange(e.target.value)}
+          >
+            {trailRoutes.map((trailRoute) => (
+              <MenuItem value={trailRoute.trail_id} key={trailRoute.trail_id}>
+                {trailRoute.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
         {!selectedMarker && !detailsClicked && !settingsClicked && (
           <>
             <Button variant="contained" className="tripDetails" onClick={TripDetailsClickHandler}>
               Trip Details
             </Button>
             <Button
-              className="settings-button"
+              className="settings"
               onClick={() => setSettingsClicked(true)}
               aria-label="Open settings"
               style={{
@@ -177,13 +223,6 @@ const MapComponent = () => {
                 backgroundColor: "transparent",
               }}
             ></Button>
-
-            <img
-              className="settings"
-              src="settings.webp"
-              alt="line render of a settings cog icon"
-              onClick={() => setSettingsClicked(true)}
-            />
             <DetailSummary markers={markers} />
           </>
         )}
@@ -206,6 +245,7 @@ const MapComponent = () => {
             setMarkers={setMarkers}
             closeOverlay={closeSearchOverlay}
             settingsData={settingsData}
+            selectedTrailRoute={selectedTrailRoute}
           />
         </div>
       )}
@@ -247,6 +287,7 @@ const MapComponent = () => {
             // setSettingsClicked={setSettingsClicked}
             markers={markers}
             setMarkers={setMarkers}
+            selectedTrailRoute={selectedTrailRoute}
           />
         </div>
       )}
