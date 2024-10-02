@@ -9,7 +9,6 @@ const coord2: RoutePoint = { lat: 48.858844, lng: 2.294351 }; // Paris, France
 describe.only("haversineDistance", () => {
   it("should calculate distance between two points in kilometers", () => {
     const result = haversineDistance(coord1, coord2, "km");
-    console.log("Distance (km):", result);
     expect(result).toBeCloseTo(5829.5, 1); // Rough distance between New York and Paris in km
   });
 

@@ -6,7 +6,7 @@ export interface UserMarker {
   nextDist: Distance;
   _id: string;
   user_id: string;
-  hotel: string;
+  hotel?: string;
   order?: number;
   walkingSpeed: number;
   distanceMeasure: string;

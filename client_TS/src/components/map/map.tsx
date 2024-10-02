@@ -1,26 +1,26 @@
-import './map.css';
-import { useEffect, useState } from 'react';
-import { Marker, MapContainer, TileLayer, useMapEvents } from 'react-leaflet';
-import * as L from 'leaflet';
-import GPXLayer from '../gpxMapLayer/gpxMapLayer';
-import closestPoints from '../../helperFunctions/closestPoint';
-import routeCalculation from '../../helperFunctions/routeCalculation';
-import DBService from '../../services/DBService';
-import { v4 as uuidv4 } from 'uuid';
-import 'leaflet-gpx';
-import 'leaflet/dist/leaflet.css';
-import { Button } from '@mui/material';
-import DetailSummary from '../detailSummary/detailSummary';
-import SearchResultScreen from '../searchResultScreen/searchResultScreen';
-import Settings from '../settings/settings';
-import TripDetailsScreen from '../tripDetailsScreen/tripDetailsScreen';
-import { SettingsData } from '../../types/settingsData';
-import { UserMarker } from '../../types/userMarker';
-import { RoutePoint } from '../../types/route';
+import "./map.css";
+import { useEffect, useState } from "react";
+import { Marker, MapContainer, TileLayer, useMapEvents } from "react-leaflet";
+import * as L from "leaflet";
+import GPXLayer from "../gpxMapLayer/gpxMapLayer";
+import closestPoints from "../../helperFunctions/closestPoint";
+import routeCalculation from "../../helperFunctions/routeCalculation";
+import DBService from "../../services/DBService";
+import { v4 as uuidv4 } from "uuid";
+import "leaflet-gpx";
+import "leaflet/dist/leaflet.css";
+import { Button } from "@mui/material";
+import DetailSummary from "../detailSummary/detailSummary";
+import SearchResultScreen from "../searchResultScreen/searchResultScreen";
+import Settings from "../settings/settings";
+import TripDetailsScreen from "../tripDetailsScreen/tripDetailsScreen";
+import { SettingsData } from "../../types/settingsData";
+import { UserMarker } from "../../types/userMarker";
+import { RoutePoint } from "../../types/route";
 
 // set icon for placed markers
 const defaultIcon = L.icon({
-  iconUrl: '/map-pin.svg',
+  iconUrl: "/map-pin.svg",
   iconSize: [25, 41],
   iconAnchor: [12, 41],
   popupAnchor: [1, -34],
@@ -28,14 +28,14 @@ const defaultIcon = L.icon({
 });
 
 const MapComponent = () => {
-  const gpxFile = '/WHW.gpx';
+  const gpxFile = "/WHW.gpx";
   const [markers, setMarkers] = useState({});
   const [gpxRoute, setGpxRoute] = useState<RoutePoint[]>([]);
   const [selectedMarker, setSelectedMarker] = useState<UserMarker | null>(null);
   const [detailsClicked, setDetailsClicked] = useState<Boolean>(false);
   const [settingsClicked, setSettingsClicked] = useState<Boolean>(false);
   const [settingsData, setSettingsData] = useState<SettingsData>({
-    distance: 'km',
+    distance: "km",
     speed: 3,
   });
 
@@ -44,30 +44,28 @@ const MapComponent = () => {
   };
 
   useEffect(() => {
-    DBService.getMarkers('aidan@test.com').then(
-      (data: UserMarker[] | string | undefined) => {
-        if (Array.isArray(data) && data) {
-          const dataOut: { [key: string]: UserMarker } = data.reduce(
-            (acc: { [key: string]: UserMarker }, curr: UserMarker) => {
-              acc[curr._id] = curr;
-              return acc;
-            },
-            {}
-          );
-          setMarkers(dataOut);
-          const keys = Object.keys(dataOut);
-          if (keys.length > 0) {
-            const firstMarker: UserMarker = dataOut[keys[0]];
-            if (firstMarker.walkingSpeed) {
-              setSettingsData((prev) => ({
-                ...prev,
-                speed: firstMarker.walkingSpeed,
-              }));
-            }
+    DBService.getMarkers("aidan@test.com").then((data: UserMarker[] | string | undefined) => {
+      if (Array.isArray(data) && data) {
+        const dataOut: { [key: string]: UserMarker } = data.reduce(
+          (acc: { [key: string]: UserMarker }, curr: UserMarker) => {
+            acc[curr._id] = curr;
+            return acc;
+          },
+          {}
+        );
+        setMarkers(dataOut);
+        const keys = Object.keys(dataOut);
+        if (keys.length > 0) {
+          const firstMarker: UserMarker = dataOut[keys[0]];
+          if (firstMarker.walkingSpeed) {
+            setSettingsData((prev) => ({
+              ...prev,
+              speed: firstMarker.walkingSpeed,
+            }));
           }
         }
       }
-    );
+    });
   }, []);
 
   // handler from marker being added to map
@@ -79,9 +77,9 @@ const MapComponent = () => {
           const closestPoint: RoutePoint = await closestPoints(e.latlng); // snap clicked position to route
           const newMarker: UserMarker = {
             _id: uuidv4(),
-            user_id: 'aidan@test.com',
+            user_id: "aidan@test.com",
             position: L.latLng([closestPoint.lat, closestPoint.lng]),
-            hotel: '',
+            hotel: "",
             prevDist: { dist: 0, time: 0 },
             nextDist: { dist: 0, time: 0 },
             walkingSpeed: settingsData.speed,
@@ -92,11 +90,13 @@ const MapComponent = () => {
             ...markers,
             [newMarker._id]: newMarker,
           };
-          const calculatedMarkers: { [key: string]: UserMarker } =
-            await routeCalculation(Object.values(updatedMarkers), settingsData);
+          const calculatedMarkers: { [key: string]: UserMarker } = await routeCalculation(
+            Object.values(updatedMarkers),
+            settingsData
+          );
           setMarkers(calculatedMarkers);
           DBService.addMarker(
-            'aidan@test.com',
+            "aidan@test.com",
             calculatedMarkers[newMarker._id],
             calculatedMarkers,
             settingsData
@@ -116,7 +116,7 @@ const MapComponent = () => {
     if (marker) {
       setSelectedMarker(marker);
     } else {
-      console.error('Marker not found in state');
+      console.error("Marker not found in state");
     }
   };
 
@@ -142,7 +142,7 @@ const MapComponent = () => {
       <div className="mapContainer">
         <MapContainer
           minZoom={9}
-          style={{ height: '100vh', width: '100%' }}
+          style={{ height: "100vh", width: "100%" }}
           zoomControl={false}
           scrollWheelZoom={!selectedMarker}
           dragging={!selectedMarker}
@@ -174,13 +174,24 @@ const MapComponent = () => {
         />
         {!selectedMarker && !detailsClicked && !settingsClicked && (
           <>
-            <Button
-              variant="contained"
-              className="tripDetails"
-              onClick={TripDetailsClickHandler}
-            >
+            <Button variant="contained" className="tripDetails" onClick={TripDetailsClickHandler}>
               Trip Details
             </Button>
+            <Button
+              className="settings-button"
+              onClick={() => setSettingsClicked(true)}
+              aria-label="Open settings"
+              style={{
+                backgroundImage: `url(settings.webp)`,
+                backgroundSize: "contain",
+                backgroundRepeat: "no-repeat",
+                width: "40px",
+                height: "40px",
+                border: "none",
+                backgroundColor: "transparent",
+              }}
+            ></Button>
+
             <img
               className="settings"
               src="settings.webp"
@@ -195,12 +206,12 @@ const MapComponent = () => {
         <div
           className="overlay1"
           style={{
-            position: 'absolute',
+            position: "absolute",
             zIndex: 1000,
             top: 0,
             left: 0,
-            width: '100%',
-            height: '100%',
+            width: "100%",
+            height: "100%",
           }}
         >
           <SearchResultScreen
@@ -215,12 +226,12 @@ const MapComponent = () => {
         <div
           className="overlay2"
           style={{
-            position: 'absolute',
+            position: "absolute",
             zIndex: 1000,
             top: 0,
             left: 0,
-            width: '100%',
-            height: '100%',
+            width: "100%",
+            height: "100%",
           }}
         >
           <TripDetailsScreen
@@ -234,12 +245,12 @@ const MapComponent = () => {
         <div
           className="overlay3"
           style={{
-            position: 'absolute',
+            position: "absolute",
             zIndex: 1000,
             top: 0,
             left: 0,
-            width: '100%',
-            height: '100%',
+            width: "100%",
+            height: "100%",
           }}
         >
           <Settings

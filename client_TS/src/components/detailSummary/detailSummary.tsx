@@ -1,20 +1,16 @@
 import "./detailSummary.css";
-
-interface Marker {
-  _id: string;
-  order: number;
-  prevDist?: { dist: number; time: number };
-  nextDist?: { dist: number; time: number };
-}
+import { UserMarker } from "../../types/userMarker";
 
 interface DetailSummaryProps {
-  markers: Record<string, Marker>;
+  markers: { [key: string]: UserMarker };
 }
 
 function DetailSummary({ markers }: DetailSummaryProps) {
   if (!markers || Object.keys(markers).length === 0) {
     return (
-      <div style={{ zIndex: "-100", position: "absolute", top: "1px" }}>No markers placed!</div>
+      <div className="detailSummary">
+        <div style={{ zIndex: "1000", position: "absolute", top: "1px" }}>No markers placed!</div>
+      </div>
     );
   }
 
@@ -46,7 +42,7 @@ function DetailSummary({ markers }: DetailSummaryProps) {
           sortedMarkers.map((marker) => (
             <div className="marker" key={marker._id}>
               <img className="markerIcon" src="map-pin.svg" alt="marker icon" />
-              <p style={{ marginBottom: "0px" }}>Stop {marker.order}</p>
+              <p style={{ marginBottom: "0px" }}>{`Stop ${marker.order}`}</p>
               <div className="markerInfo">
                 <p className="emoji">&#128315;</p>
                 <p style={{ marginBottom: "0px" }}>
