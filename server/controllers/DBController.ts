@@ -5,7 +5,8 @@ export const getMarkers = async (req: Request, res: Response): Promise<void> => 
   try {
     const { user_id } = req.query;
     const { trail_id } = req.query;
-    const markers = await UserMarkers.find({ userid: user_id, trail_id: trail_id });
+
+    const markers = await UserMarkers.find({ user_id: user_id, trail_id: trail_id });
     res.status(200).json(markers);
   } catch (error) {
     res.status(500).send(`Server Error in getMarkers: ${(error as Error).message}`);
@@ -14,13 +15,8 @@ export const getMarkers = async (req: Request, res: Response): Promise<void> => 
 
 export const addMarker = async (req: Request, res: Response): Promise<void> => {
   try {
-    // const { _id, user_id, trail_id, marker, updatedMarkers, settings } = req.body;
     const { marker, updatedMarkers } = req.body;
-
-    // const position = {
-    //   lat: marker.position.lat,
-    //   lng: marker.position.lng,
-    // };
+    // updatedMarkers should be [], not{}
 
     const newMarker = new UserMarkers({
       _id: marker._id,
@@ -37,7 +33,7 @@ export const addMarker = async (req: Request, res: Response): Promise<void> => {
 
     await newMarker.save();
 
-    const updatePromises = Object.keys(updatedMarkers).map(async (key) => {
+    const updatePromises = updatedMarkers.map(async (key: number) => {
       return UserMarkers.findOneAndUpdate(
         { _id: key },
         {
@@ -60,7 +56,7 @@ export const updateAllMarkers = async (req: Request, res: Response): Promise<voi
   try {
     const { markers } = req.body;
 
-    const updatePromises = Object.keys(markers).map(async (key) => {
+    const updatePromises = markers.map(async (key: number) => {
       return UserMarkers.updateOne({ _id: key }, markers[key]);
     });
 

@@ -12,7 +12,9 @@ export const getMarkers = (req, res) => __awaiter(void 0, void 0, void 0, functi
     try {
         const { user_id } = req.query;
         const { trail_id } = req.query;
-        const markers = yield UserMarkers.find({ userid: user_id, trail_id: trail_id });
+        console.log("user_id", user_id);
+        console.log("trail_id", trail_id);
+        const markers = yield UserMarkers.find({ user_id: user_id, trail_id: trail_id });
         res.status(200).json(markers);
     }
     catch (error) {
@@ -21,12 +23,8 @@ export const getMarkers = (req, res) => __awaiter(void 0, void 0, void 0, functi
 });
 export const addMarker = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // const { _id, user_id, trail_id, marker, updatedMarkers, settings } = req.body;
         const { marker, updatedMarkers } = req.body;
-        // const position = {
-        //   lat: marker.position.lat,
-        //   lng: marker.position.lng,
-        // };
+        // updatedMarkers should be [], not{}
         const newMarker = new UserMarkers({
             _id: marker._id,
             user_id: marker.user_id,
@@ -40,7 +38,7 @@ export const addMarker = (req, res) => __awaiter(void 0, void 0, void 0, functio
             distanceMeasure: marker.distanceMeasure,
         });
         yield newMarker.save();
-        const updatePromises = Object.keys(updatedMarkers).map((key) => __awaiter(void 0, void 0, void 0, function* () {
+        const updatePromises = updatedMarkers.map((key) => __awaiter(void 0, void 0, void 0, function* () {
             return UserMarkers.findOneAndUpdate({ _id: key }, {
                 prevDist: updatedMarkers[key].prevDist,
                 nextDist: updatedMarkers[key].nextDist,
@@ -57,7 +55,7 @@ export const addMarker = (req, res) => __awaiter(void 0, void 0, void 0, functio
 export const updateAllMarkers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { markers } = req.body;
-        const updatePromises = Object.keys(markers).map((key) => __awaiter(void 0, void 0, void 0, function* () {
+        const updatePromises = markers.map((key) => __awaiter(void 0, void 0, void 0, function* () {
             return UserMarkers.updateOne({ _id: key }, markers[key]);
         }));
         yield Promise.all(updatePromises);

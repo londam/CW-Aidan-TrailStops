@@ -13,25 +13,16 @@ async function getMarkers(user_id: string, trail_id: string) {
   }
 }
 
-async function addMarker(
-  user_id: string,
-  marker: UserMarker,
-  updatedMarkers: { [key: string]: UserMarker },
-  settings: SettingsData
-) {
+async function addMarker(marker: UserMarker, updatedMarkers: { [key: string]: UserMarker }) {
   try {
-    const _id = marker._id;
     const response = await fetch("http://localhost:3001/mapMarkers", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        // _id: _id,  // it's already contained inside of marker!
-        // user_id: user_id, // it's already contained inside of marker!
         marker: marker,
         updatedMarkers: updatedMarkers,
-        // settings: settings, // it's already contained inside of marker!
       }),
     });
     const data = await response.json();
