@@ -116,32 +116,41 @@ const MapComponent = () => {
             e.latlng,
             selectedTrailRoute.gpxFile
           ); // snap clicked position to route
-          const newMarker: UserMarker = {
-            _id: uuidv4(),
-            user_id: userID,
-            trail_id: selectedTrailRoute.trail_id,
-            position: L.latLng([closestPoint.lat, closestPoint.lng]),
-            //  position: { lat: closestPoint.lat, lng: closestPoint.lng }, //TODO Why did I complicate this line above???
-            hotel: "",
-            prevDist: { dist: 0, time: 0 },
-            nextDist: { dist: 0, time: 0 },
-            walkingSpeed: settingsData.speed,
-            distanceMeasure: settingsData.distance,
-          };
 
-          let updatedMarkers: UserMarker[] = [...markers, newMarker];
+          // Calculate the distance between the clicked point and the closest point on the route
+          const distanceToRoute = e.latlng.distanceTo(L.latLng(closestPoint.lat, closestPoint.lng));
 
-          const calculatedMarkers: UserMarker[] = await routeCalculation(
-            updatedMarkers,
-            settingsData,
-            selectedTrailRoute.gpxFile
-          );
-          setMarkers(calculatedMarkers);
-          await DBService.addMarker(newMarker, calculatedMarkers);
+          // Define a threshold for how close the click must be to the route (e.g., 1 kilometer)
+          const thresholdDistance = 1000; // Adjust this threshold as needed
 
-          setSelectedMarker(
-            calculatedMarkers.find((marker) => marker._id === newMarker._id) || null
-          );
+          if (distanceToRoute <= thresholdDistance) {
+            const newMarker: UserMarker = {
+              _id: uuidv4(),
+              user_id: userID,
+              trail_id: selectedTrailRoute.trail_id,
+              position: L.latLng([closestPoint.lat, closestPoint.lng]),
+              //  position: { lat: closestPoint.lat, lng: closestPoint.lng }, //TODO Why did I complicate this line above???
+              hotel: "",
+              prevDist: { dist: 0, time: 0 },
+              nextDist: { dist: 0, time: 0 },
+              walkingSpeed: settingsData.speed,
+              distanceMeasure: settingsData.distance,
+            };
+
+            let updatedMarkers: UserMarker[] = [...markers, newMarker];
+
+            const calculatedMarkers: UserMarker[] = await routeCalculation(
+              updatedMarkers,
+              settingsData,
+              selectedTrailRoute.gpxFile
+            );
+            setMarkers(calculatedMarkers);
+            await DBService.addMarker(newMarker, calculatedMarkers);
+
+            setSelectedMarker(
+              calculatedMarkers.find((marker) => marker._id === newMarker._id) || null
+            );
+          }
         }
       },
     });
