@@ -19,6 +19,7 @@ async function getMarkers(user_id: string, trail_id: string) {
 }
 
 async function addMarker(marker: UserMarker, updatedMarkers: UserMarker[]) {
+  //comment delete this
   try {
     const response = await fetch("http://localhost:3001/mapMarkers", {
       method: "POST",
