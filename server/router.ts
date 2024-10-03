@@ -1,6 +1,8 @@
 import express, { Request, Response } from 'express';
 import * as Accommodation from './controllers/apiController.js';
 import * as DB from './controllers/DBController.js';
+import { loginUser, registerUser } from './controllers/authController.js';
+import { authenticateToken } from './middleware/authMiddleware.js';
 
 const router = express.Router();
 
@@ -20,11 +22,15 @@ router.delete('/mapMarkers', async (req: Request, res: Response) => {
   await DB.removeMarker(req, res);
 });
 
-router.post('/user', async (req: Request, res: Response) => {
-  await DB.addUser(req, res);
+router.post('/register', async (req: Request, res: Response) => {
+  await registerUser(req, res);
 });
 
-router.get('/user', async (req: Request, res: Response) => {
+router.post('/login', async (req: Request, res: Response) => {
+  await loginUser(req, res);
+});
+
+router.get('/user', authenticateToken, async (req: Request, res: Response) => {
   await DB.getUser(req, res);
 });
 

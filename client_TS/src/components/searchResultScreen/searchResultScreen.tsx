@@ -8,7 +8,15 @@ import { UserMarker } from "../../types/userMarker";
 import { SettingsData } from "../../types/settingsData";
 import { TrailRoute } from "../map/map";
 
-const userID = "66f5228c61b5d88b81ec241c";
+// Function to get user ID from token
+const getUserIdFromToken = (): string | null => {
+  const token = localStorage.getItem("authToken");
+  if (token) {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.email || null; // Extract email from token as user ID
+  }
+  return null;
+};
 
 interface SearchResultScreenProps {
   marker: UserMarker;
@@ -30,6 +38,8 @@ function SearchResultScreen({
   const [nearAccommodation, setNearAccommodation] = useState<any[]>([]);
   const [selectedAccommodation, setSelectedAccommodation] = useState("");
 
+  const userID = getUserIdFromToken(); // Extract user ID from the token
+
   useEffect(() => {
     if (marker.position) {
       const [lon, lat] = [marker.position.lat, marker.position.lng];
@@ -37,7 +47,7 @@ function SearchResultScreen({
         setNearAccommodation(Array.isArray(data) ? data : []);
       });
     }
-    if (marker._id) {
+    if (marker._id && userID) {
       DBService.getAccommodation(userID, marker._id).then((hotel) => {
         if (hotel) {
           setSelectedAccommodation(hotel.hotel);
@@ -46,21 +56,23 @@ function SearchResultScreen({
         }
       });
     }
-  }, [marker]);
+  }, [marker, userID]);
 
   function updateAccommodation(accommodation: string) {
     setSelectedAccommodation(accommodation);
-    const updatedMarkers = {
-      ...markers,
-      [marker._id]: { ...marker, hotel: accommodation },
-    };
+    const updatedMarkers = markers.map((m) =>
+      m._id === marker._id ? { ...m, hotel: accommodation } : m
+    );
     setMarkers(updatedMarkers);
-    DBService.addAccommodation(userID, accommodation, marker._id);
+    if (userID) {
+      DBService.addAccommodation(userID, accommodation, marker._id); // Use authenticated userID
+    }
   }
 
   async function deleteMarker(marker: UserMarker) {
-    //TODO check if user_id is not needed?shouldn't be needed
-    DBService.removeMarker(userID, marker._id);
+    if (userID) {
+      DBService.removeMarker(userID, marker._id); // Use authenticated userID
+    }
 
     const index = markers.indexOf(marker);
     if (index === -1) {
@@ -71,11 +83,11 @@ function SearchResultScreen({
     const updatedMarkers = [...markers];
     updatedMarkers.splice(index, 1);
 
-    //nullify indexes of neighouring markers
-    const enrichedMarkers = updatedMarkers.map((marker) => ({
-      ...marker,
-      prevIndex: marker.prevIndex || 0,
-      nextIndex: marker.nextIndex || 0,
+    // Nullify indexes of neighboring markers
+    const enrichedMarkers = updatedMarkers.map((m) => ({
+      ...m,
+      prevIndex: m.prevIndex || 0,
+      nextIndex: m.nextIndex || 0,
     }));
 
     //and then calculate it again

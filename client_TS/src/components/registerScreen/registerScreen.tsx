@@ -25,11 +25,36 @@ function RegisterScreen() {
     password: '',
     route: '0',
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
   // function to handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    DBService.addUser(formData.name, formData.email, formData.password);
-    navigate('/map', { state: { email: formData.email } });
+
+    setIsSubmitting(true);
+    setErrorMessage('');
+
+    try {
+      // Get register service
+      const response = await DBService.registerUser(
+        formData.name,
+        formData.email,
+        formData.password
+      );
+
+      // If registration goes through, store token and go to map
+      if (response) {
+        localStorage.setItem('authToken', response.token);
+        navigate('/map', { state: { email: formData.email } });
+      } else {
+        setErrorMessage('Registration failed');
+      }
+    } catch (error) {
+      setErrorMessage('An error occurred during registration');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -97,8 +122,9 @@ function RegisterScreen() {
               </MenuItem>
             </Select>
 
-            <Button variant="contained" type="submit">
-              Register
+            {errorMessage && <div className="errorMessage">{errorMessage}</div>}
+            <Button variant="contained" type="submit" disabled={isSubmitting}>
+              {isSubmitting ? 'Registering...' : 'Register'}
             </Button>
           </FormControl>
         </form>

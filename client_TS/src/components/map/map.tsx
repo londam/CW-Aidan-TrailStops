@@ -18,10 +18,7 @@ import { SettingsData } from "../../types/settingsData";
 import { UserMarker } from "../../types/userMarker";
 import { RoutePoint } from "../../types/route";
 
-const userID = "66f5228c61b5d88b81ec241c";
-
-// set icon for placed markers
-const defaultIcon = L.icon({
+const defaultIcon = new L.Icon({
   iconUrl: "/map-pin.svg",
   iconSize: [25, 41],
   iconAnchor: [12, 41],
@@ -34,6 +31,16 @@ export interface TrailRoute {
   gpxFile: string;
   name: string;
 }
+
+// get user ID from token
+const getUserIdFromToken = (): string | null => {
+  const token = localStorage.getItem("authToken");
+  if (token) {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.email || null;
+  }
+  return null;
+};
 
 const MapComponent = () => {
   const trailRoutes: TrailRoute[] = [
@@ -75,32 +82,36 @@ const MapComponent = () => {
     speed: 3,
   });
 
+  const userID = getUserIdFromToken();
+
   const setGpxRouteFunc = (route: RoutePoint[]) => {
     setGpxRoute(route);
   };
 
   useEffect(() => {
-    DBService.getMarkers(userID, selectedTrailRoute.trail_id).then(
-      (data: UserMarker[] | string | undefined) => {
-        if (Array.isArray(data) && data) {
-          data.sort((a, b) => a.order - b.order);
-          setMarkers(data);
-          if (data[0] && data[0].walkingSpeed) {
-            setSettingsData((prev) => ({
-              ...prev,
-              speed: data[0].walkingSpeed,
-            }));
+    if (userID) {
+      DBService.getMarkers(userID, selectedTrailRoute.trail_id).then(
+        (data: UserMarker[] | string | undefined) => {
+          if (Array.isArray(data) && data) {
+            data.sort((a, b) => a.order - b.order);
+            setMarkers(data);
+            if (data[0] && data[0].walkingSpeed) {
+              setSettingsData((prev) => ({
+                ...prev,
+                speed: data[0].walkingSpeed,
+              }));
+            }
           }
         }
-      }
-    );
-  }, [selectedTrailRoute]);
+      );
+    }
+  }, [userID, selectedTrailRoute]);
 
-  // handler from marker being added to map
+  // handler for marker being added to the map
   const MapClickHandler = () => {
     useMapEvents({
       click: async (e) => {
-        if (gpxRoute) {
+        if (gpxRoute && userID) {
           const closestPoint: RoutePoint = await closestPoints(
             e.latlng,
             selectedTrailRoute.gpxFile
@@ -110,6 +121,7 @@ const MapComponent = () => {
             user_id: userID,
             trail_id: selectedTrailRoute.trail_id,
             position: L.latLng([closestPoint.lat, closestPoint.lng]),
+            //  position: { lat: closestPoint.lat, lng: closestPoint.lng }, //TODO Why did I complicate this line above???
             hotel: "",
             prevDist: { dist: 0, time: 0 },
             nextDist: { dist: 0, time: 0 },
@@ -125,11 +137,8 @@ const MapComponent = () => {
             selectedTrailRoute.gpxFile
           );
           setMarkers(calculatedMarkers);
-          DBService.addMarker(newMarker, calculatedMarkers);
-          // timeout to make sure point is added to state.
-          setTimeout(() => {
-            setSelectedMarker(newMarker);
-          }, 100);
+          await DBService.addMarker(newMarker, calculatedMarkers);
+          setSelectedMarker(newMarker);
         }
       },
     });
@@ -145,7 +154,7 @@ const MapComponent = () => {
     }
   };
 
-  // handler from tripDetails button being clicked
+  // handler for tripDetails button click
   const TripDetailsClickHandler = () => {
     setDetailsClicked(true);
   };
@@ -303,7 +312,6 @@ const MapComponent = () => {
             closeOverlay={closeSettingsOverlay}
             settingsData={settingsData}
             setSettingsData={setSettingsData}
-            // setSettingsClicked={setSettingsClicked}
             markers={markers}
             setMarkers={setMarkers}
             selectedTrailRoute={selectedTrailRoute}

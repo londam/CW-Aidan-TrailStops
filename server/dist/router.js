@@ -10,6 +10,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import express from 'express';
 import * as Accommodation from './controllers/apiController.js';
 import * as DB from './controllers/DBController.js';
+import { loginUser, registerUser } from './controllers/authController.js';
+import { authenticateToken } from './middleware/authMiddleware.js';
 const router = express.Router();
 router.get('/mapMarkers', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield DB.getMarkers(req, res);
@@ -23,10 +25,13 @@ router.put('/updateAllMarkers', (req, res) => __awaiter(void 0, void 0, void 0, 
 router.delete('/mapMarkers', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield DB.removeMarker(req, res);
 }));
-router.post('/user', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    yield DB.addUser(req, res);
+router.post('/register', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    yield registerUser(req, res);
 }));
-router.get('/user', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post('/login', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    yield loginUser(req, res);
+}));
+router.get('/user', authenticateToken, (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     yield DB.getUser(req, res);
 }));
 router.get('/accommodation', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
