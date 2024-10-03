@@ -16,7 +16,6 @@ async function closestPoints(pointCoords: RoutePoint, selectedTrailRouteGPX: str
   const target = pointCoords;
   const nearest = nearestNeighbor(kdTree, target);
   if (nearest) {
-    console.log(`Nearest point is: (${nearest.point.lat}, ${nearest.point.lng})`);
     return { lat: nearest.point.lat, lng: nearest.point.lng };
   } else {
     console.log("No nearest neighbor found.");
