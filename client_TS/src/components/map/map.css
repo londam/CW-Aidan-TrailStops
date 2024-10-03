@@ -36,7 +36,8 @@
 
 .route-selector {
   position: fixed;
-  top: -20vh;
+  top: -95vh;
+
   max-height: 15%;
   max-width: 25%;
   z-index: 6000;

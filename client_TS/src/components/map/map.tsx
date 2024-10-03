@@ -47,7 +47,23 @@ const MapComponent = () => {
       gpxFile: "/mapstogpxWHW.gpx",
       name: "Better WHW Route :)",
     },
+    {
+      trail_id: "Full_PCT",
+      gpxFile: "/Full_PCT.gpx",
+      name: "Dream Route :)",
+    },
+    {
+      trail_id: "CLDT",
+      gpxFile: "/CLDT_Croatian_Long_Distance_Trail_2023_v1.gpx",
+      name: "Welcome to Croatia",
+    },
+    {
+      trail_id: "SLO_E7",
+      gpxFile: "/SLO_european_long_distance_E7.gpx",
+      name: "Across Slovenia",
+    },
   ];
+
   const [selectedTrailRoute, setSelectedTrailRoute] = useState<TrailRoute>(trailRoutes[0]);
   const [markers, setMarkers] = useState<UserMarker[]>([]);
   const [gpxRoute, setGpxRoute] = useState<RoutePoint[]>([]);
@@ -155,7 +171,7 @@ const MapComponent = () => {
     <>
       <div className="mapContainer">
         <MapContainer
-          minZoom={9}
+          minZoom={3}
           style={{ height: "100vh", width: "100%" }}
           zoomControl={false}
           scrollWheelZoom={!selectedMarker}
@@ -185,25 +201,13 @@ const MapComponent = () => {
           })}
           <MapClickHandler />
         </MapContainer>
+
         <img
           className="backpackMapImg"
           src="backpack.png"
           alt="brown backpack open at the front showing a wilderness scene inside"
         />
-        <FormControl className="route-selector" variant="filled">
-          <InputLabel id="route-select-label">Select Route</InputLabel>
-          <Select
-            labelId="route-select-label"
-            value={selectedTrailRoute.trail_id}
-            onChange={(e) => onSelectedTrailRouteChange(e.target.value)}
-          >
-            {trailRoutes.map((trailRoute) => (
-              <MenuItem value={trailRoute.trail_id} key={trailRoute.trail_id}>
-                {trailRoute.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+
         {!selectedMarker && !detailsClicked && !settingsClicked && (
           <>
             <Button variant="contained" className="tripDetails" onClick={TripDetailsClickHandler}>
@@ -224,6 +228,21 @@ const MapComponent = () => {
               }}
             ></Button>
             <DetailSummary markers={markers} />
+
+            <FormControl className="route-selector" style={{ backgroundColor: "white" }}>
+              <InputLabel id="route-select-label">Select Route</InputLabel>
+              <Select
+                labelId="route-select-label"
+                value={selectedTrailRoute.trail_id}
+                onChange={(e) => onSelectedTrailRouteChange(e.target.value)}
+              >
+                {trailRoutes.map((trailRoute) => (
+                  <MenuItem value={trailRoute.trail_id} key={trailRoute.trail_id}>
+                    {trailRoute.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           </>
         )}
       </div>
