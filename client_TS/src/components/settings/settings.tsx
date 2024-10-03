@@ -38,7 +38,8 @@ function Settings({
       }
     };
     updateMarkers();
-  }, [settingsData, markers, setMarkers]); // Trigger on settingsData change
+    // }, [settingsData, markers, setMarkers]); // Trigger on settingsData change
+  }, []); // Trigger on settingsData change
 
   const changeSpeedSetting = (event: SelectChangeEvent<number>) => {
     setSettingsData({ ...settingsData, speed: Number(event.target.value) });

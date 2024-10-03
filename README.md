@@ -26,12 +26,12 @@ Google Places API - Used for performing nearby search for relevant hotels/ camps
 
 ### Future Development Points
 
-- More routes
-- Show distance/time data before placing marker based on user mouse placement on screen along the route.
-- Ability to only click on the route and nothing else to place markers more accurately
+- More routes - done
+- Show distance/time data before placing marker based on user mouse placement on screen along the route. - need more optimization - too laggy
+- Ability to only click on the route and nothing else to place markers more accurately - done
 - Distance/ walking pace settings
 - Accommodation Links
-- proper login functionality (authentication, password hashing)
+- proper login functionality (authentication, password hashing) - done
 
 ### Install and run app locally
 

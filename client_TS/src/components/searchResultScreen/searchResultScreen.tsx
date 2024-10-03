@@ -109,7 +109,21 @@ function SearchResultScreen({
           <ul className="accommodationList">
             {nearAccommodation === null ? (
               // Loading skeleton from MUI
-              <Skeleton variant="rectangular" width={400} height={400} />
+              <>
+                <Skeleton
+                  variant="rectangular"
+                  width={400}
+                  height={66}
+                  style={{ marginBottom: "10px" }}
+                />
+                <Skeleton
+                  variant="rectangular"
+                  width={400}
+                  height={278}
+                  style={{ marginBottom: "10px" }}
+                />
+                <Skeleton variant="rectangular" width={100} height={60} />
+              </>
             ) : nearAccommodation.length === 0 ? (
               // No accommodations found
               <p>No accommodation found.</p>
