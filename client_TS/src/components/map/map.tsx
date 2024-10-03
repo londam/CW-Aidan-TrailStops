@@ -121,7 +121,7 @@ const MapComponent = () => {
           const distanceToRoute = e.latlng.distanceTo(L.latLng(closestPoint.lat, closestPoint.lng));
 
           // Define a threshold for how close the click must be to the route (e.g., 1 kilometer)
-          const thresholdDistance = 1000; // Adjust this threshold as needed
+          const thresholdDistance = 100; // Adjust this threshold as needed
 
           if (distanceToRoute <= thresholdDistance) {
             const newMarker: UserMarker = {
