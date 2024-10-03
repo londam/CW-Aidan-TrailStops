@@ -138,7 +138,10 @@ const MapComponent = () => {
           );
           setMarkers(calculatedMarkers);
           await DBService.addMarker(newMarker, calculatedMarkers);
-          setSelectedMarker(newMarker);
+
+          setSelectedMarker(
+            calculatedMarkers.find((marker) => marker._id === newMarker._id) || null
+          );
         }
       },
     });

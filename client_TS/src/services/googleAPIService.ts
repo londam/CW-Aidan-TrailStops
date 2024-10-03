@@ -1,20 +1,26 @@
 async function getNearAccommodations(lat: number, lng: number) {
   try {
+    const token = localStorage.getItem("authToken");
+    if (!token) {
+      throw new Error("No token found");
+    }
     const response: Response = await fetch(
-      `http://localhost:3001/getAccommodation?lat=${lat}&lon=${lng}`
+      `http://localhost:3001/getAccommodation?lat=${lat}&lon=${lng}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
     );
-
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-
     const data = await response.json();
     return data;
   } catch (error) {
     console.log("Error fetching accommodations:", error);
   }
 }
-
 async function extractAccommodations(lat: number, lng: number) {
   const data = await getNearAccommodations(lat, lng);
   const { results } = data;
@@ -33,16 +39,23 @@ async function extractAccommodations(lat: number, lng: number) {
   }
   return outputArr;
 }
-
 async function fetchAccommodationPicture(photoReference: string) {
+  const token = localStorage.getItem("authToken");
+  if (!token) {
+    throw new Error("No token found");
+  }
   const response = await fetch(
-    `http://localhost:3001/accommodationPic?photo_reference=${photoReference}`
+    `http://localhost:3001/accommodationPic?photo_reference=${photoReference}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
   );
   if (!response.ok) {
     throw new Error("Image not found");
-  } // Create an object URL for the blob
+  }
   return await response.json();
 }
-
 const APIService = { extractAccommodations };
 export default APIService;
