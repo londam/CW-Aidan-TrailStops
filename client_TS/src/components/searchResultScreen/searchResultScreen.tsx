@@ -2,7 +2,7 @@ import "./searchResultScreen.css";
 import APIService from "../../services/googleAPIService";
 import { useState, useEffect } from "react";
 import DBService from "../../services/DBService";
-import { Button } from "@mui/material";
+import { Button, Skeleton } from "@mui/material";
 import routeCalculation from "../../helperFunctions/routeCalculation";
 import { UserMarker } from "../../types/userMarker";
 import { SettingsData } from "../../types/settingsData";
@@ -35,7 +35,7 @@ function SearchResultScreen({
   settingsData,
   selectedTrailRoute,
 }: SearchResultScreenProps) {
-  const [nearAccommodation, setNearAccommodation] = useState<any[]>([]);
+  const [nearAccommodation, setNearAccommodation] = useState<any[] | null>(null);
   const [selectedAccommodation, setSelectedAccommodation] = useState("");
 
   const userID = getUserIdFromToken(); // Extract user ID from the token
@@ -107,7 +107,14 @@ function SearchResultScreen({
       {marker.position ? (
         <div className="accommodationOptions">
           <ul className="accommodationList">
-            {nearAccommodation.length > 0 ? (
+            {nearAccommodation === null ? (
+              // Loading skeleton from MUI
+              <Skeleton variant="rectangular" width={400} height={400} />
+            ) : nearAccommodation.length === 0 ? (
+              // No accommodations found
+              <p>No accommodation found.</p>
+            ) : (
+              // Show list of accommodations
               nearAccommodation.map((accommodation, index) => (
                 <div key={index}>
                   <li key={index}>
@@ -130,8 +137,6 @@ function SearchResultScreen({
                   </Button>
                 </div>
               ))
-            ) : (
-              <p>No accommodation found.</p>
             )}
           </ul>
           <p className="wildOption">Wild Camping</p>
