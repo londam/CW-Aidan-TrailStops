@@ -1,4 +1,4 @@
-import mongoose from "./index.js";
+import mongoose from './index.js';
 
 const Schema = mongoose.Schema;
 
@@ -30,12 +30,12 @@ const TrailSchema = new Schema({
 });
 
 const userSchema = new Schema({
-  name: String,
-  email: String,
-  password: String,
+  name: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
 });
 
-const User = mongoose.model("User", userSchema);
-const UserMarkers = mongoose.model("UserMarkers", UserMarkersSchema);
-const Trail = mongoose.model("Trail", TrailSchema);
+const User = mongoose.model('User', userSchema);
+const UserMarkers = mongoose.model('UserMarkers', UserMarkersSchema);
+const Trail = mongoose.model('Trail', TrailSchema);
 export { User, UserMarkers, Trail };

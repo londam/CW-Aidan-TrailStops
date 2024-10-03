@@ -20,7 +20,7 @@ function LoginScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // function to handle form submission
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const emailError = formData.email === '';
@@ -38,20 +38,25 @@ function LoginScreen() {
     setIsSubmitting(true);
     setErrorMessage('');
 
-    DBService.getUser(formData.email)
-      .then((data) => {
-        if (data) {
-          if (data.password === formData.password) {
-            navigate('/map', { state: { email: formData.email } });
-          } else {
-            setErrorMessage('Unknown credentials');
-          }
-        } else {
-          setErrorMessage('Unknown credentials');
-        }
-      })
-      .catch(() => setErrorMessage('An error occurred during login'))
-      .finally(() => setIsSubmitting(false));
+    try {
+      // login service
+      const response = await DBService.loginUser(
+        formData.email,
+        formData.password
+      );
+
+      // If successful, store token and navigate to map
+      if (response) {
+        localStorage.setItem('authToken', response.token);
+        navigate('/map', { state: { email: formData.email } });
+      } else {
+        setErrorMessage('Invalid credentials');
+      }
+    } catch (error) {
+      setErrorMessage('An error occurred during login');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
