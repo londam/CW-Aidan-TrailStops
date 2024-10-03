@@ -1,13 +1,21 @@
-import "./searchResultScreen.css";
-import APIService from "../../services/googleAPIService";
-import { useState, useEffect } from "react";
-import DBService from "../../services/DBService";
-import { Button } from "@mui/material";
-import routeCalculation from "../../helperFunctions/routeCalculation";
-import { UserMarker } from "../../types/userMarker";
-import { SettingsData } from "../../types/settingsData";
+import './searchResultScreen.css';
+import APIService from '../../services/googleAPIService';
+import { useState, useEffect } from 'react';
+import DBService from '../../services/DBService';
+import { Button } from '@mui/material';
+import routeCalculation from '../../helperFunctions/routeCalculation';
+import { UserMarker } from '../../types/userMarker';
+import { SettingsData } from '../../types/settingsData';
 
-const userID = "66f5228c61b5d88b81ec241c";
+// Function to get user ID from token
+const getUserIdFromToken = (): string | null => {
+  const token = localStorage.getItem('authToken');
+  if (token) {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.email || null; // Extract email from token as user ID
+  }
+  return null;
+};
 
 interface SearchResultScreenProps {
   marker: UserMarker;
@@ -25,7 +33,9 @@ function SearchResultScreen({
   settingsData,
 }: SearchResultScreenProps) {
   const [nearAccommodation, setNearAccommodation] = useState<any[]>([]);
-  const [selectedAccommodation, setSelectedAccommodation] = useState("");
+  const [selectedAccommodation, setSelectedAccommodation] = useState('');
+
+  const userID = getUserIdFromToken(); // Extract user ID from the token
 
   useEffect(() => {
     if (marker.position) {
@@ -34,30 +44,32 @@ function SearchResultScreen({
         setNearAccommodation(Array.isArray(data) ? data : []);
       });
     }
-    if (marker._id) {
+    if (marker._id && userID) {
       DBService.getAccommodation(userID, marker._id).then((hotel) => {
         if (hotel) {
           setSelectedAccommodation(hotel.hotel);
         } else {
-          console.error("Markers data is not in the expected format", hotel);
+          console.error('Markers data is not in the expected format', hotel);
         }
       });
     }
-  }, [marker]);
+  }, [marker, userID]);
 
   function updateAccommodation(accommodation: string) {
     setSelectedAccommodation(accommodation);
-    const updatedMarkers = {
-      ...markers,
-      [marker._id]: { ...marker, hotel: accommodation },
-    };
+    const updatedMarkers = markers.map((m) =>
+      m._id === marker._id ? { ...m, hotel: accommodation } : m
+    );
     setMarkers(updatedMarkers);
-    DBService.addAccommodation(userID, accommodation, marker._id);
+    if (userID) {
+      DBService.addAccommodation(userID, accommodation, marker._id); // Use authenticated userID
+    }
   }
 
   async function deleteMarker(marker: UserMarker) {
-    //TODO check if user_id is not needed?shouldn't be needed
-    DBService.removeMarker(userID, marker._id);
+    if (userID) {
+      DBService.removeMarker(userID, marker._id); // Use authenticated userID
+    }
 
     const index = markers.indexOf(marker);
     if (index === -1) {
@@ -68,15 +80,18 @@ function SearchResultScreen({
     const updatedMarkers = [...markers];
     updatedMarkers.splice(index, 1);
 
-    //nullify indexes of neighouring markers
-    const enrichedMarkers = updatedMarkers.map((marker) => ({
-      ...marker,
-      prevIndex: marker.prevIndex || 0,
-      nextIndex: marker.nextIndex || 0,
+    // Nullify indexes of neighboring markers
+    const enrichedMarkers = updatedMarkers.map((m) => ({
+      ...m,
+      prevIndex: m.prevIndex || 0,
+      nextIndex: m.nextIndex || 0,
     }));
 
-    //and then calculate it again
-    const calculatedMarkers = await routeCalculation(enrichedMarkers, settingsData);
+    // Recalculate the route with updated markers
+    const calculatedMarkers = await routeCalculation(
+      enrichedMarkers,
+      settingsData
+    );
 
     setMarkers(calculatedMarkers);
 
@@ -104,7 +119,9 @@ function SearchResultScreen({
                   <Button
                     variant="contained"
                     onClick={() =>
-                      updateAccommodation(accommodation.name + " - " + accommodation.vicinity)
+                      updateAccommodation(
+                        accommodation.name + ' - ' + accommodation.vicinity
+                      )
                     }
                   >
                     Select
@@ -116,7 +133,10 @@ function SearchResultScreen({
             )}
           </ul>
           <p className="wildOption">Wild Camping</p>
-          <Button variant="contained" onClick={() => updateAccommodation("Wild Camping")}>
+          <Button
+            variant="contained"
+            onClick={() => updateAccommodation('Wild Camping')}
+          >
             Select
           </Button>
         </div>
@@ -125,19 +145,33 @@ function SearchResultScreen({
       )}
       <div>
         <h1>Stop {marker.order}</h1>
-        <h2>Previous Stop: {marker.prevDist?.dist ? `${marker.prevDist.dist} km` : "N/A"}</h2>
+        <h2>
+          Previous Stop:{' '}
+          {marker.prevDist?.dist ? `${marker.prevDist.dist} km` : 'N/A'}
+        </h2>
         <h3>
-          Time from previous stop: {marker.prevDist?.time ? `${marker.prevDist.time} hours` : "N/A"}
+          Time from previous stop:{' '}
+          {marker.prevDist?.time ? `${marker.prevDist.time} hours` : 'N/A'}
         </h3>
-        <h2>Next Stop: {marker.nextDist?.dist ? `${marker.nextDist.dist} km` : "N/A"}</h2>
+        <h2>
+          Next Stop:{' '}
+          {marker.nextDist?.dist ? `${marker.nextDist.dist} km` : 'N/A'}
+        </h2>
         <h3>
-          Time to next stop: {marker.nextDist?.time ? `${marker.nextDist.time} hours` : "N/A"}
+          Time to next stop:{' '}
+          {marker.nextDist?.time ? `${marker.nextDist.time} hours` : 'N/A'}
         </h3>
         <p>
-          Selected accommodation:{" "}
-          {selectedAccommodation === "" ? " no accommodation selected" : selectedAccommodation}
+          Selected accommodation:{' '}
+          {selectedAccommodation === ''
+            ? ' no accommodation selected'
+            : selectedAccommodation}
         </p>
-        <Button variant="contained" style={{ marginRight: "10px" }} onClick={() => closeOverlay()}>
+        <Button
+          variant="contained"
+          style={{ marginRight: '10px' }}
+          onClick={() => closeOverlay()}
+        >
           Back
         </Button>
         <Button variant="contained" onClick={() => deleteMarker(marker)}>

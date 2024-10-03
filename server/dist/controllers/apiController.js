@@ -8,19 +8,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 // import fetch from 'node-fetch-cjs';
-import dotenv from "dotenv";
+import dotenv from 'dotenv';
 dotenv.config();
 export const getAccommodation = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { lon, lat } = req.query;
         const apiKey = process.env.GOOGLE_API_KEY;
-        const response = yield fetch(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=${apiKey}&location=${lat},${lon}&radius=500&type=lodging`);
+        const response = yield fetch(`https://maps.googleapis.com/maps/api/place/nearbysearch/json?key=${apiKey}&location=${lat},${lon}&radius=5000&type=lodging`);
         const data = yield response.json();
         res.status(200).json(data);
     }
     catch (error) {
         console.error(error);
-        res.status(500).send("Server Error");
+        res.status(500).send('Server Error');
     }
 });
 export const getAccommodationPic = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -34,13 +34,13 @@ export const getAccommodationPic = (req, res) => __awaiter(void 0, void 0, void 
         }
         else {
             const errorMessage = yield response.text();
-            console.error("Error fetching image:", errorMessage);
-            res.status(404).send("Image not found");
+            console.error('Error fetching image:', errorMessage);
+            res.status(404).send('Image not found');
         }
     }
     catch (error) {
         console.error(error);
-        res.status(500).send("Server Error");
+        res.status(500).send('Server Error');
     }
 });
 export const getAccommodationDetails = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -53,6 +53,6 @@ export const getAccommodationDetails = (req, res) => __awaiter(void 0, void 0, v
     }
     catch (error) {
         console.error(error);
-        res.status(500).send("Server Error");
+        res.status(500).send('Server Error');
     }
 });

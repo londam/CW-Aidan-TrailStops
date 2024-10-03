@@ -1,129 +1,170 @@
-import { SettingsData } from "../types/settingsData";
-import { UserMarker } from "../types/userMarker";
+import { SettingsData } from '../types/settingsData';
+import { UserMarker } from '../types/userMarker';
 
 async function getMarkers(user_id: string, trail_id: string) {
   try {
     const response: Response = await fetch(
-      `http://localhost:3001/mapMarkers?user_id=${user_id}&trail_id=${trail_id}`
+      `http://localhost:3001/mapMarkers?user_id=${user_id}&trail_id=${trail_id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+        },
+      }
     );
     const data: string = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching markers:", error);
+    console.log('Error fetching markers:', error);
   }
 }
 
 async function addMarker(marker: UserMarker, updatedMarkers: UserMarker[]) {
   try {
-    const response = await fetch("http://localhost:3001/mapMarkers", {
-      method: "POST",
+    const response = await fetch('http://localhost:3001/mapMarkers', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('authToken')}`,
       },
       body: JSON.stringify({
         marker: marker,
         updatedMarkers: updatedMarkers,
       }),
     });
-    console.log(
-      JSON.stringify({
-        marker: marker,
-        updatedMarkers: updatedMarkers,
-      })
-    );
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error adding marker:", error);
+    console.log('Error adding marker:', error);
   }
 }
 
 async function updateAllMarkers(markers: { [key: string]: UserMarker }) {
   try {
-    const response = await fetch("http://localhost:3001/updateAllMarkers", {
-      method: "PUT",
+    const response = await fetch('http://localhost:3001/updateAllMarkers', {
+      method: 'PUT',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('authToken')}`,
       },
       body: JSON.stringify({ markers: markers }),
     });
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error updating markers:", error);
+    console.log('Error updating markers:', error);
   }
 }
 
-async function addUser(name: string, email: string, password: string) {
+async function registerUser(name: string, email: string, password: string) {
   try {
-    const response = await fetch("http://localhost:3001/user", {
-      method: "POST",
+    const response = await fetch('http://localhost:3001/register', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ name: name, email: email, password: password }),
+      body: JSON.stringify({ name, email, password }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Registration failed');
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.log('Error registering user:', error.message);
+    throw error;
+  }
+}
+
+async function loginUser(email: string, password: string) {
+  try {
+    const response = await fetch('http://localhost:3001/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
     });
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error adding user:", error);
+    console.log('Error logging in user:', error);
   }
 }
 
 async function getUser(email: string) {
   try {
-    const response = await fetch(`http://localhost:3001/user?email=${email}`);
+    const response = await fetch(`http://localhost:3001/user?email=${email}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+      },
+    });
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error fetching user:", error);
+    console.log('Error fetching user:', error);
   }
 }
 
 async function getAccommodation(email: string, markerId: string) {
   try {
     const response = await fetch(
-      `http://localhost:3001/accommodation?user_id=${email}&markerId=${markerId}`
+      `http://localhost:3001/accommodation?user_id=${email}&markerId=${markerId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('authToken')}`,
+        },
+      }
     );
     const data = await response.json();
-    console.log("getAccomodation Data:", data);
     return data;
   } catch (error) {
-    console.log("Error fetching user:", error);
+    console.log('Error fetching accommodation:', error);
   }
 }
 
-async function addAccommodation(email: string, hotel: string, markerId: string) {
+async function addAccommodation(
+  email: string,
+  hotel: string,
+  markerId: string
+) {
   try {
-    const response = await fetch("http://localhost:3001/accommodation", {
-      method: "PUT",
+    const response = await fetch('http://localhost:3001/accommodation', {
+      method: 'PUT',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('authToken')}`,
       },
-      body: JSON.stringify({ user_id: email, hotel: hotel, markerId: markerId }),
+      body: JSON.stringify({
+        user_id: email,
+        hotel: hotel,
+        markerId: markerId,
+      }),
     });
 
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error adding accommodation:", error);
+    console.log('Error adding accommodation:', error);
   }
 }
 
 async function removeMarker(userId: string, markerId: string) {
-  // TODO Fix bug where it marker is only delete after second attempt sometimes.
   try {
-    const response = await fetch("http://localhost:3001/mapMarkers", {
-      method: "DELETE",
+    const response = await fetch('http://localhost:3001/mapMarkers', {
+      method: 'DELETE',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('authToken')}`,
       },
       body: JSON.stringify({ user_id: userId, _id: markerId }),
     });
     const data = await response.json();
     return data;
   } catch (error) {
-    console.log("Error removing marker:", error);
+    console.log('Error removing marker:', error);
   }
 }
 
@@ -131,10 +172,12 @@ const DBService = {
   getMarkers,
   addMarker,
   updateAllMarkers,
-  addUser,
+  registerUser,
+  loginUser,
   getUser,
   getAccommodation,
   addAccommodation,
   removeMarker,
 };
+
 export default DBService;
